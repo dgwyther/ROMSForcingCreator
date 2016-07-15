@@ -11,7 +11,7 @@ frcname = 'tisom009_dailyclima_sbc.nc';
 RunName = 'tisom009';
 MinYear = 1992;
 MaxYear = 2013;
-windbounds = [13 124 20 57];
+windbounds = [13 124 20 57]; %lonmin lonmax latmin latmax
 Takeshibounds = [410 550 500 640]; %[colmin colmax rowmin rowmax]
 % new Amery flux bounds  [100 352 520 720];
 % old Totten flux bounds [410 550 500 640];
@@ -23,14 +23,15 @@ Takeshibounds = [410 550 500 640]; %[colmin colmax rowmin rowmax]
 FluxType = 1;
 % (1) daily fluxes (1992-2013)
 % (2) daily fluxes averaged to monthly (1992-2013)
-% (3) monthly fluxes (1992-2007 only)
-%%%%%%%% (4) monthly fluxes (1 year only) DEPRECATED OPTION
+% (3) daily fluxes climatology with TOK anomaly (XX - XX ?)
+% (4) monthly fluxes (1992-2007 only)
 
 WindType = 3;
-% (1) CORE daily->monthly (1992-2007)
-%%%%%% (2) NCEP repeated year   DEPRECATED OPTION
-% (3) ERA-interim daily forcing (1992-2013)
-% (4) ERA-interim daily->monthly forcing (1992-2013)
+% (1) COREv2 daily->monthly (1992-2007)
+% (2) COREv2 daily (1992-2014)
+% (3) COREv1 normal year
+% (4) ERA-interim daily forcing (1992-2013)
+% (5) ERA-interim daily->monthly forcing (1992-2013)
 
 ForcingType = 6;
 % (1) Interannual forcing Daily, multiple files
@@ -52,9 +53,9 @@ read_tamura_daily
 elseif FluxType == 2
 read_tamura_daily_to_monthly
 elseif FluxType == 3
+read_tamura_daily_clima_TOK
+elseif FluxType == 4
 read_tamura_monthly
-%elseif FluxType == 4
-%read_tamura_spinup_A
 end
 
 Imin_wind = windbounds(1);
@@ -64,10 +65,12 @@ Jmax_wind = windbounds(4);
 if WindType == 1;
 CORE_grid_stress_daily_to_monthly
 elseif WindType == 2;
-core_ISOM_grid_stress_1yearforcing_A
-elseif WindType == 3;
-ERA_interim_misom_grid_stress_annual
+CORE_stress_daily
+elseif WindType == 3
+COREv1_stress_normal
 elseif WindType == 4;
+ERA_interim_misom_grid_stress_annual
+elseif WindType == 5;
 ERA_interim_misom_grid_stress_annual_daily_to_monthly
 end
 
