@@ -31,6 +31,10 @@ DataProduct = 5;
 % (3) cube84 
 % (4) cube92 monthly
 % (5) cube92 3-daily
+% (6) Dinniman ACCIMA 5-km
+% (7) O'Kane monthly ocean model (100 normal years) - COREv1 forced
+% (8) O'Kane monthly ocean model (1948-2006) - COREv2 forced
+
 
 ForcingType = 10;
 % (1) cube84 repeated 1992 ] deprecated
@@ -45,9 +49,10 @@ ForcingType = 10;
 %(10) cube92-3day climatology
 %(11) ACCIMA 5-km climatology
 %(12) ACCIMA 5-km IAF
+%(13) O'Kane-COREv1 monthly interannual
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-ecco2_id = {'salt','theta','uvel','vvel'}; %load and interp ecco2 data
+force_id = {'salt','theta','uvel','vvel'}; %load and interp ecco2 data
 xmin = ECCObounds(1); 
 xmax = ECCObounds(2);
 ymin = ECCObounds(3); 
@@ -55,23 +60,35 @@ ymax = ECCObounds(4);
 
 if DataProduct == 1
     for ii = 1:4
-        eval(['do_interp_ecco2_',ecco2_id{ii},'_1yrforcing_A'])
+        eval(['do_interp_ecco2_',force_id{ii},'_1yrforcing_A'])
     end
 elseif DataProduct == 2 
     for ii = 1:4
-        eval(['do_interp_ecco2_',ecco2_id{ii},'_A'])
+        eval(['do_interp_ecco2_',force_id{ii},'_A'])
     end  
 elseif DataProduct == 3
     for ii = 1:4
-        eval(['do_interp_ecco2_',ecco2_id{ii},'_cube84'])
+        eval(['do_load_ecco2_',force_id{ii},'_cube84'])
     end
 elseif DataProduct == 4
     for ii = 1:4
-        eval(['do_interp_ecco2_',ecco2_id{ii},'_cube92'])
+        eval(['do_load_ecco2_',force_id{ii},'_cube92'])
     end
 elseif DataProduct == 5
     for ii = 1:4
-        eval(['do_interp_ecco2_',ecco2_id{ii},'_cube92_3day'])
+        eval(['do_load_ecco2_',force_id{ii},'_cube92_3day'])
+    end
+elseif DataProduct == 6
+    for ii = 1:4
+        eval(['do_load_ACCIMA_',force_id{ii},'_5km'])
+    end
+elseif DataProduct == 7
+    for ii = 1:4
+        eval(['do_load_OKane_',force_id{ii},'_corev1'])
+    end
+elseif DataProduct == 8
+    for ii = 1:4
+        eval(['do_load_OKane_',force_id{ii},'_corev2'])
     end
 
 end
@@ -104,6 +121,9 @@ elseif ForcingType == 11;
 do_ISOM_lbc_ACCIMA_5km_clima
 elseif ForcingType == 12;
 do_ISOM_lbc_ACCIMA_5km
+elseif ForcingType == 13;
+do_ISOM_lbc_OKane_corev1_iaf
+
 end
 
 

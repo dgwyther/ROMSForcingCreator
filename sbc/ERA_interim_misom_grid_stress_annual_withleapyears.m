@@ -130,57 +130,6 @@ disp(['Interpolating daily data to ROMS grid for ',num2str(YearInd)])
    v_index = v_index+size(vwnd,1);
 end
 
- disp(['Saving u_stress and v_stress for ' num2str(MinYear) ' to ' num2str(MaxYear) 'with backup leap year data'])
-   % save u and v component with the model grid, and a vector rotation
-   nameval=['ustress_grid_model_',num2str(MinYear),'_',num2str(MaxYear),'withleapyear.mat'];
-   save(nameval,'u_stress_All','-v7.3');
-   nameval=['vstress_grid_model_' num2str(MinYear),'_',num2str(MaxYear),'withleapyear.mat'];
-   save(nameval,'v_stress_All','-v7.3');
-
-
-LeapYear = [1992:4:2040]; %leap years til 2040
-disp('Removing leap year data: cut and remove data on feb-29 leap years')
-% METHOD 1
-%ly=zeros([1 366]); ly(60)=1;
-%nly=zeros([1 365]);
-%ly_index=ismember([MinYear:MaxYear],LeapYear); 
-%feb29_index=[];
-%for ii=1:length(ly_index)
-%if ly_index(ii)==1
-%feb29_index=[feb29_index,ly];
-%elseif ly_index(ii)==0
-%feb29_index=[feb29_index,nly];
-%end
-%end
-% METHOD 2
-%shfluxClima_tmp = nans(366,MaxYear-MinYear+1,x,y);
-%DayLoop=1;
-%for yy = 1:MaxYear-MinYear+1
-%for dd = 1:365
-%if any(yy+MinYear-1==LeapYear) & dd==60;
-%shfluxClima_tmp(dd,yy,x,y) = shfluxGrid(DayLoop+1,:,:);
-%shfluxClima_tmp(366,yy,x,y) = shfluxGrid(DayLoop,:,:);
-%DayLoop=DayLoop+1;
-%else 
-%shfluxClima_tmp(dd,yy,x,y) = shfluxGrid(DayLoop,:,:);
-%end
-%DayLoop=DayLoop+1;
-%end
-%end
-%shfluxClima=nanmean(shfluxClima_tmp,1);
-% METHOD 3
-feb29_index=zeros([1 size(u_stress_All,1)]);
-FLYpos = find(ismember([MinYear:MaxYear],LeapYear),1);
-for ii=0:length(find(ismember([MinYear:MaxYear],LeapYear)))-1
-feb29_index( ((FLYpos-1)*365+60) + ii*(306+(365*3)+60))=1;
-end
-uwndClima_tmp=u_stress_All; clear u_stress_All
-vwndClima_tmp=v_stress_All; clear v_stress_All
-for ii=find(feb29_index)'%loop through feb-29 indices
-uwndClima_tmp(ii,:,:)=[]; %remove feb29 values
-vwndClima_tmp(ii,:,:)=[]; %remove feb29 values
-end
-
  disp(['Saving u_stress and v_stress for ' num2str(MinYear) ' to ' num2str(MaxYear)])
    % save u and v component with the model grid, and a vector rotation
    nameval=['ustress_grid_model.mat'];

@@ -13,20 +13,17 @@ angle = ncread(grdname,'angle')';
 mask_rho = ncread(grdname,'mask_rho')';
 
 
-% MinYear = 1992;
-% MaxYear = 2007; %1993; % This is loaded from make_sbc.m
-NumYears = MaxYear-MinYear+1;
 SamRate = 4;% Sampling per day
 
-%%% Load data
+disp('loading COREv1 data') %%% Load data
 U_10_data = '/ds/projects/iomp/obs/COREv1_23JUN2016/CNYF/u_10_mod.clim.nc';
 V_10_data = '/ds/projects/iomp/obs/COREv1_23JUN2016/CNYF/v_10_mod.clim.nc';
 
-U_10_MOD = ncread(U_10_data,'U_10_MOD',[Imin_wind J_min_wind 1],[Imax_wind-Imin_wind+1 Jmax_wind-Jmin_wind+1 Inf]); %loads as lon,lat,time
-V_10_MOD = ncread(V_10_data,'V_10_MOD',[Imin_wind J_min_wind 1],[Imax_wind-Imin_wind+1 Jmax_wind-Jmin_wind+1 Inf]); %loads as lon,lat,time
-LONS = ncread(U_10_data,'LON');
-LATS = ncread(V_10_data,'LAT');
-[LONS,LATS]=meshgrid(LON(Imin_wind:Imax_wind),LAT(Jmin_wind:Jmax_wind));
+U_10_MOD = ncread(U_10_data,'U_10_MOD',[Imin_wind Jmin_wind 1],[Imax_wind-Imin_wind+1 Jmax_wind-Jmin_wind+1 Inf]); %loads as lon,lat,time
+V_10_MOD = ncread(V_10_data,'V_10_MOD',[Imin_wind Jmin_wind 1],[Imax_wind-Imin_wind+1 Jmax_wind-Jmin_wind+1 Inf]); %loads as lon,lat,time
+LON = ncread(U_10_data,'LON',Imin_wind,Imax_wind-Imin_wind+1);
+LAT = ncread(V_10_data,'LAT',Jmin_wind,Jmax_wind-Jmin_wind+1);
+[LATS,LONS]=meshgrid(LAT,LON); 
 
 
 %% convert vel -> stress
@@ -36,9 +33,10 @@ Cd = 1.4e-3;
 taux = rhoAir*Cd.*abs(U_10_MOD).*U_10_MOD;
 tauy = rhoAir*Cd.*abs(V_10_MOD).*V_10_MOD;
 
+clear U_10_MOD V_10_MOD
 
 if 0 % daily->monthly data
-% Makes monthly climatologies from daily climatologies: 
+disp('converting daily to monthly data') % Makes monthly climatologies from daily climatologies: 
 MDM = [31 28 31 30 31 30 31 31 30 31 30 31]; % matrix number of day in each month, without leap years
 kk=1;
 for ii = 1:12
@@ -62,9 +60,15 @@ end
 
 end
 if 1 % daily data
+disp('gridding COREv1 to model grid')
+uwm_stress=squeeze(nanmean(reshape(taux,Imax_wind-Imin_wind+1,Jmax_wind-Jmin_wind+1,SamRate,[]),3));
+vwm_stress=squeeze(nanmean(reshape(tauy,Imax_wind-Imin_wind+1,Jmax_wind-Jmin_wind+1,SamRate,[]),3));
 
-uwm_stress=nanmean(reshape(taux,Imax_wind-Imin_wind+1,Jmax_wind-Jmin_wind+1,SamRate,[]),3);
-vwm_stress=nanmean(reshape(tauy,Imax_wind-Imin_wind+1,Jmax_wind-Jmin_wind+1,SamRate,[]),3);
+clear taux tauy
+
+AISuwm_stress=nan(size(uwm_stress,3),size(lat_rho,1),size(lat_rho,2));
+AISvwm_stress=nan(size(uwm_stress,3),size(lat_rho,1),size(lat_rho,2));
+
 
 for ii = 1:size(uwm_stress,3);
 AISuwm_stress(ii,:,:) = griddata(LONS,LATS,squeeze(uwm_stress(:,:,ii)),lon_rho,lat_rho,'cubic');

@@ -3,31 +3,11 @@ title =([RunName,'surface heat/salt fluxes and wind stress']); % Make title from
 
 disp('load air sea flux file (big file so load it once and subset later)')
 load([RunName,'_air_sea_fluxes_daily.mat'])
-load('ustress_grid_model.mat')
-load('vstress_grid_model.mat')
+load(['ustress_grid_model.mat'])
+load(['vstress_grid_model.mat'])
 
-shfluxClima_tmp=shfluxGrid; clear shfluxGrid
-ssfluxClima_tmp=ssfluxGrid; clear ssfluxGrid
-uwndClima_tmp=u_stress_All; clear u_stress_All
-vwndClima_tmp=v_stress_All; clear v_stress_All
+LeapYear = [1992:4:2040]; %leap years til 2040
 
-% reshape into climatology shape (if removal of leap years hasn't happened this will chop to necessary length by ignoring leftover days at end
-shfluxClima_tmp= reshape(shfluxClima_tmp(1:365*(MaxYear-MinYear+1),:,:), [365 (MaxYear-MinYear+1) size(shfluxClima_tmp,2) size(shfluxClima_tmp,3)]);
-ssfluxClima_tmp= reshape(ssfluxClima_tmp(1:365*(MaxYear-MinYear+1),:,:), [365 (MaxYear-MinYear+1) size(ssfluxClima_tmp,2) size(ssfluxClima_tmp,3)]);
-
-uwndClima_tmp = reshape(uwndClima_tmp(1:365*(MaxYear-MinYear+1),:,:), [365 (MaxYear-MinYear+1) size(uwndClima_tmp,2) size(uwndClima_tmp,3) ]);
-vwndClima_tmp = reshape(vwndClima_tmp(1:365*(MaxYear-MinYear+1),:,:), [365 (MaxYear-MinYear+1) size(vwndClima_tmp,2) size(vwndClima_tmp,3) ]);
-
-
-% Make 364 day climatology
-ssfluxClima=squeeze(nanmean(ssfluxClima_tmp,2));
-shfluxClima=squeeze(nanmean(shfluxClima_tmp,2));
-uwndClima=squeeze(nanmean(uwndClima_tmp,2));
-vwndClima=squeeze(nanmean(vwndClima_tmp,2));
-shfluxClima(365,:,:)=[]; %kill dec/31
-ssfluxClima(365,:,:)=[]; %kill dec/31
-uwndClima(365,:,:)=[]; %kill dec/31
-vwndClima(365,:,:)=[]; %kill dec/31
 
 
 disp(' ')
@@ -35,8 +15,8 @@ disp([' Creating the file : ',frcname])
 disp(' ')
 
 
-time_big = 364; %days
-cycle = time_big;
+time_big = 12; %years
+cycle = 364;
 Lpinfo=ncinfo(grdname,'lon_rho'); Lp = Lpinfo.Size(1);
 Mpinfo=ncinfo(grdname,'lat_rho'); Mp = Mpinfo.Size(2);
 L=Lp-1;
@@ -118,18 +98,25 @@ netcdf.endDef(id);
 
     disp('Write time variable')
 
-swft = [1:cycle]; %data at each day of cycle
-shft = [1:cycle];
+swft = [((cycle/time_big)/2):(cycle/time_big):(cycle)-((cycle/time_big)/2)]; %data at mid each month
+shft = [((cycle/time_big)/2):(cycle/time_big):(cycle)-((cycle/time_big)/2)];
 
 netcdf.putVar(id, sms_time_id, swft);
 netcdf.putVar(id, shf_time_id, shft);
 netcdf.putVar(id, swf_time_id, swft);
 
     disp('write salt and heat flux variables')
-shf = shfluxClima;%squeeze(nanmean(shfluxMon,2));
-swf = ssfluxClima;%squeeze(nanmean(ssfluxMon,2));
-su  = uwndClima;%squeeze(nanmean(u_stress_Mon,2));
-sv  = vwndClima;%squeeze(nanmean(v_stress_Mon,2));
+
+shfluxMon = reshape(shfluxGrid,time_big,[],size(shfluxGrid,2),size(shfluxGrid,3));
+ssfluxMon = reshape(ssfluxGrid,time_big,[],size(ssfluxGrid,2),size(ssfluxGrid,3));
+u_stress_Mon = reshape(u_stress_All,time_big,[],size(u_stress_All,2),size(u_stress_All,3));
+v_stress_Mon = reshape(v_stress_All,time_big,[],size(v_stress_All,2),size(v_stress_All,3));
+
+shf = squeeze(nanmean(shfluxMon,2));
+swf = squeeze(nanmean(ssfluxMon,2));
+su  = squeeze(nanmean(u_stress_Mon,2));
+sv  = squeeze(nanmean(v_stress_Mon,2));
+
 
     disp('inpainting nans in wind fields...')
 addpath('/ds/projects/iomp/matlab_scripts')
@@ -152,7 +139,6 @@ shf(shf > 0) = shf(shf > 0)*0.5;
 %swf(swf <=0) = -1e-6;
 
 refSalt = 34.4; % Reference salinity
-dm = 365.25/12; % Days in a month (365.25days/12 months):
 
 
 netcdf.putVar(id, shflux_id, permute(shf,[3 2 1]));% (W/m^2)

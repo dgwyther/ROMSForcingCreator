@@ -5,17 +5,16 @@
 % Adapted to Daily forcing by E. Cougnon at /ds/projects/iomp/obs/Tamura_air_sea_fluxes/daily/ (May 2013)
 % Poked around a bit by D Gwyther at /ds/projects/iomp/totten/ana/dgwyther/netcdf/forcing_creator/sbc/read_tamura_daily.m (March and Dec 2014)
 % major changes by D Gwyther, Jan 2016
+% merged to new file for just 1995 (defined as a normal clima year) by D Gwyther, Jul 2016
 %%%%%%
 
 lon_rho=ncread(grdname,'lon_rho')';
 lat_rho=ncread(grdname,'lat_rho')';
 
-NumYears = MaxYear-MinYear+1;
-
-shfluxtmp = nan(xmax-xmin+1,ymax-ymin+1,365*NumYears); %a little bit smaller
-ssfluxtmp = nan(xmax-xmin+1,ymax-ymin+1,365*NumYears); %due to not including
-shflux = nan(365*NumYears,xmax-xmin+1,ymax-ymin+1);    %leap years.
-ssflux = nan(365*NumYears,xmax-xmin+1,ymax-ymin+1);
+shfluxtmp = nan(xmax-xmin+1,ymax-ymin+1,365); 
+ssfluxtmp = nan(xmax-xmin+1,ymax-ymin+1,365); 
+shflux = nan(365,xmax-xmin+1,ymax-ymin+1);
+ssflux = nan(365,xmax-xmin+1,ymax-ymin+1);
 
 %% Read in land mask
 fid3=fopen('/ds/projects/iomp/obs/Tamura_air_sea_fluxes/daily_latest/EASE_landmask_H.data','r');
@@ -25,21 +24,10 @@ landmaskNaN(landmaskNaN==0)=NaN;
 ii = 1;
 Month = ['jan';'feb';'mar';'apr';'may';'jun';'jul';'aug';'sep';'oct';'nov';'dec'];
 DaysPerMonth=[31,28,31,30,31,30,31,31,30,31,30,31];
-LeapYears = [1992:4:2040]; %leap years til 2040
 %% Read in data:
-for YearInd = MinYear:MaxYear; %1992:2007;
+for YearInd = 1995
  for MonthInd = 1:12; %Keep track of current month
-
-  %this loop corrects for leap years
-  if any(YearInd == LeapYears)
-   if MonthInd == 2 %correct feb no.of.days
-    dms = 29;
-   else
     dms = DaysPerMonth(MonthInd);
-   end
-  else
-   dms = DaysPerMonth(MonthInd);
-  end
 
     display(['Reading in GrADS data ' num2str(YearInd),' ',Month(MonthInd,:),' ...']);
     eval(['fid = fopen(''/ds/projects/iomp/obs/Tamura_air_sea_fluxes/daily_latest/TSDM2hb_' num2str(YearInd),'_',Month(MonthInd,:),'.data'',''r'');']),
@@ -100,57 +88,8 @@ for j = 1:DayNumber;
 if ~rem(j,round(DayNumber/10)), disp(['gridding ',num2str(j/DayNumber*100),' done.']), end
 end
 
-disp('Saving gridded Heat/Salt fluxes with leap year data')
-save([RunName,'_air_sea_fluxes_daily_withleapyear.mat'],'shfluxGrid','ssfluxGrid','-v7.3')
-disp('Saved.')
 
-
-LeapYear = [1992:4:2040]; %leap years til 2040
-
-disp('Making climatology: cut and remove data on feb-29 leap years')
-% METHOD 1
-%ly=zeros([1 366]); ly(60)=1;
-%nly=zeros([1 365]);
-%ly_index=ismember([MinYear:MaxYear],LeapYear); 
-%feb29_index=[];
-%for ii=1:length(ly_index)
-%if ly_index(ii)==1
-%feb29_index=[feb29_index,ly];
-%elseif ly_index(ii)==0
-%feb29_index=[feb29_index,nly];
-%end
-%end
-% METHOD 2
-%shfluxClima_tmp = nans(366,MaxYear-MinYear+1,x,y);
-%DayLoop=1;
-%for yy = 1:MaxYear-MinYear+1
-%for dd = 1:365
-%if any(yy+MinYear-1==LeapYear) & dd==60;
-%shfluxClima_tmp(dd,yy,x,y) = shfluxGrid(DayLoop+1,:,:);
-%shfluxClima_tmp(366,yy,x,y) = shfluxGrid(DayLoop,:,:);
-%DayLoop=DayLoop+1;
-%else 
-%shfluxClima_tmp(dd,yy,x,y) = shfluxGrid(DayLoop,:,:);
-%end
-%DayLoop=DayLoop+1;
-%end
-%end
-%shfluxClima=nanmean(shfluxClima_tmp,1);
-% METHOD 3
-feb29_index=zeros([1 size(shfluxGrid,1)]);
-FLYpos = find(ismember([MinYear:MaxYear],LeapYear),1);
-for ii=0:length(find(ismember([MinYear:MaxYear],LeapYear)))-1
-feb29_index( ((FLYpos-1)*365+60) + ii*(306+(365*3)+60))=1;
-end
-shfluxClima_tmp=shfluxGrid; clear shfluxGrid
-ssfluxClima_tmp=ssfluxGrid; clear ssfluxGrid
-for ii=find(feb29_index)'%loop through feb-29 indices
-shfluxClima_tmp(ii,:,:)=[]; %remove feb29 values
-ssfluxClima_tmp(ii,:,:)=[]; %remove feb29 values
-end
-end
-
-disp('Saving gridded Heat/Salt fluxes')
+disp('Saving gridded Heat/Salt fluxes for 1995')
 save([RunName,'_air_sea_fluxes_daily.mat'],'shfluxGrid','ssfluxGrid','-v7.3')
 disp('Saved.')
 

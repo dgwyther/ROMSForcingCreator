@@ -6,6 +6,7 @@ load([RunName,'_air_sea_fluxes_daily.mat'])
 load('ustress_grid_model.mat')
 load('vstress_grid_model.mat')
 
+
 shfluxClima_tmp=shfluxGrid; clear shfluxGrid
 ssfluxClima_tmp=ssfluxGrid; clear ssfluxGrid
 uwndClima_tmp=u_stress_All; clear u_stress_All
@@ -19,23 +20,18 @@ uwndClima_tmp = reshape(uwndClima_tmp(1:365*(MaxYear-MinYear+1),:,:), [365 (MaxY
 vwndClima_tmp = reshape(vwndClima_tmp(1:365*(MaxYear-MinYear+1),:,:), [365 (MaxYear-MinYear+1) size(vwndClima_tmp,2) size(vwndClima_tmp,3) ]);
 
 
-% Make 364 day climatology
+% Make 365 day climatology
 ssfluxClima=squeeze(nanmean(ssfluxClima_tmp,2));
 shfluxClima=squeeze(nanmean(shfluxClima_tmp,2));
 uwndClima=squeeze(nanmean(uwndClima_tmp,2));
 vwndClima=squeeze(nanmean(vwndClima_tmp,2));
-shfluxClima(365,:,:)=[]; %kill dec/31
-ssfluxClima(365,:,:)=[]; %kill dec/31
-uwndClima(365,:,:)=[]; %kill dec/31
-vwndClima(365,:,:)=[]; %kill dec/31
-
 
 disp(' ')
 disp([' Creating the file : ',frcname])
 disp(' ')
 
 
-time_big = 364; %days
+time_big = 365; %days
 cycle = time_big;
 Lpinfo=ncinfo(grdname,'lon_rho'); Lp = Lpinfo.Size(1);
 Mpinfo=ncinfo(grdname,'lat_rho'); Mp = Mpinfo.Size(2);
@@ -152,7 +148,6 @@ shf(shf > 0) = shf(shf > 0)*0.5;
 %swf(swf <=0) = -1e-6;
 
 refSalt = 34.4; % Reference salinity
-dm = 365.25/12; % Days in a month (365.25days/12 months):
 
 
 netcdf.putVar(id, shflux_id, permute(shf,[3 2 1]));% (W/m^2)

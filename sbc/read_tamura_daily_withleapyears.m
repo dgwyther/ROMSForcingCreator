@@ -97,61 +97,9 @@ shfluxGrid = nan(DayNumber,size(lat_rho,1),size(lat_rho,2));
 for j = 1:DayNumber;
     ssfluxGrid(j,:,:) = griddata(AllLon,AllLat,squeeze(ssflux(j,:,:)),lon_rho,lat_rho,'cubic');
     shfluxGrid(j,:,:) = griddata(AllLon,AllLat,squeeze(shflux(j,:,:)),lon_rho,lat_rho,'cubic');
-if ~rem(j,round(DayNumber/10)), disp(['gridding ',num2str(j/DayNumber*100),' done.']), end
+    disp(['gridding ',num2str(j/DayNumber*100),' done.'])
 end
 
-disp('Saving gridded Heat/Salt fluxes with leap year data')
-save([RunName,'_air_sea_fluxes_daily_withleapyear.mat'],'shfluxGrid','ssfluxGrid','-v7.3')
-disp('Saved.')
-
-
-LeapYear = [1992:4:2040]; %leap years til 2040
-
-disp('Making climatology: cut and remove data on feb-29 leap years')
-% METHOD 1
-%ly=zeros([1 366]); ly(60)=1;
-%nly=zeros([1 365]);
-%ly_index=ismember([MinYear:MaxYear],LeapYear); 
-%feb29_index=[];
-%for ii=1:length(ly_index)
-%if ly_index(ii)==1
-%feb29_index=[feb29_index,ly];
-%elseif ly_index(ii)==0
-%feb29_index=[feb29_index,nly];
-%end
-%end
-% METHOD 2
-%shfluxClima_tmp = nans(366,MaxYear-MinYear+1,x,y);
-%DayLoop=1;
-%for yy = 1:MaxYear-MinYear+1
-%for dd = 1:365
-%if any(yy+MinYear-1==LeapYear) & dd==60;
-%shfluxClima_tmp(dd,yy,x,y) = shfluxGrid(DayLoop+1,:,:);
-%shfluxClima_tmp(366,yy,x,y) = shfluxGrid(DayLoop,:,:);
-%DayLoop=DayLoop+1;
-%else 
-%shfluxClima_tmp(dd,yy,x,y) = shfluxGrid(DayLoop,:,:);
-%end
-%DayLoop=DayLoop+1;
-%end
-%end
-%shfluxClima=nanmean(shfluxClima_tmp,1);
-% METHOD 3
-feb29_index=zeros([1 size(shfluxGrid,1)]);
-FLYpos = find(ismember([MinYear:MaxYear],LeapYear),1);
-for ii=0:length(find(ismember([MinYear:MaxYear],LeapYear)))-1
-feb29_index( ((FLYpos-1)*365+60) + ii*(306+(365*3)+60))=1;
-end
-shfluxClima_tmp=shfluxGrid; clear shfluxGrid
-ssfluxClima_tmp=ssfluxGrid; clear ssfluxGrid
-for ii=find(feb29_index)'%loop through feb-29 indices
-shfluxClima_tmp(ii,:,:)=[]; %remove feb29 values
-ssfluxClima_tmp(ii,:,:)=[]; %remove feb29 values
-end
-end
-
-disp('Saving gridded Heat/Salt fluxes')
+disp('Saving gridded Heat/Salt fluxes (note this data HAS leap years')
 save([RunName,'_air_sea_fluxes_daily.mat'],'shfluxGrid','ssfluxGrid','-v7.3')
 disp('Saved.')
-
-
