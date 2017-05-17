@@ -89,11 +89,11 @@ ERA_interim_misom_grid_stress_annual_withleapyears
 end
 
 if ForcingType == 1
-do_ISOM_sbc_nc_daily_IAF_yearlyfiles.m
+do_ISOM_sbc_nc_daily_IAF_yearlyfiles
 elseif ForcingType == 2
-do_ISOM_sbc_nc_daily_IAF.m
+do_ISOM_sbc_nc_daily_IAF
 elseif ForcingType == 3
-do_ISOM_sbc_nc_daily_IAF_separatefrc.m
+do_ISOM_sbc_nc_daily_IAF_separatefrc
 elseif ForcingType == 4
 do_ISOM_sbc_nc_monthly_1file_v2
 elseif ForcingType == 5

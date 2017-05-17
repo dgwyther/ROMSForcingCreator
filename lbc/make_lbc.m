@@ -39,7 +39,7 @@ DataProduct = 7;
 ForcingType = 13;
 % (1) cube84 repeated 1992 ] deprecated
 % (2) cube84 interannual   ] deprecated
-% (3) cube92 interannual
+% (3) cube92 interannual w/ 365 day year
 % (4) cube92 climatology
 % (5) cube92 constant forcing
 % (6) cube92 climatology w/ 364 day year

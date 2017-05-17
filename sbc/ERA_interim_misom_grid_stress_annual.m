@@ -181,6 +181,10 @@ uwndClima_tmp(ii,:,:)=[]; %remove feb29 values
 vwndClima_tmp(ii,:,:)=[]; %remove feb29 values
 end
 
+u_stress_All=uwndClima_tmp;
+v_stress_All=vwndClima_tmp;
+disp(' if you selected to make a climatology, then there is a slight bug here - need to save the uwndClima file for loading in  the next step - need to fix this up')
+
  disp(['Saving u_stress and v_stress for ' num2str(MinYear) ' to ' num2str(MaxYear)])
    % save u and v component with the model grid, and a vector rotation
    nameval=['ustress_grid_model.mat'];

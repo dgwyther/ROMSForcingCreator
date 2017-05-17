@@ -148,7 +148,6 @@ for ii=find(feb29_index)'%loop through feb-29 indices
 shfluxClima_tmp(ii,:,:)=[]; %remove feb29 values
 ssfluxClima_tmp(ii,:,:)=[]; %remove feb29 values
 end
-end
 
 disp('Saving gridded Heat/Salt fluxes')
 save([RunName,'_air_sea_fluxes_daily.mat'],'shfluxGrid','ssfluxGrid','-v7.3')
