@@ -37,16 +37,17 @@ WindType = 3;
 % (6) ERA-interim daily forcing (1992-2013) with leap year data
 
 ForcingType = 6;
-% (1) Interannual forcing Daily, multiple files
+% (1) Interannual forcing Daily, multiple files (1 per year)
 % (2) Interannual forcing Daily, 1 file
-% (3) Interannual forcing, Monthly
-% (4) Climatology forcing, Monthly  % DEPRECATED. REMOVE. %%%%%%%%%%%%%%%%%%%%%%%
-% (5) Climatology forcing (364 days), Monthly
-% (6) Climatology forcing (364 days), Daily
-% (7) Climatology forcing (365 days), Monthly
-% (8) Climatology forcing (365 days), Daily
-% (9) Constant forcing
-% (10) Constant forcing (summer)
+% (3) Interannual forcing Daily, multiple files (1 per forcing type)
+% (4) Interannual forcing, Monthly
+% (5) Climatology forcing, Monthly  % DEPRECATED. REMOVE. %%%%%%%%%%%%%%%%%%%%%%%
+% (6) Climatology forcing (364 days), Monthly
+% (7) Climatology forcing (364 days), Daily
+% (8) Climatology forcing (365 days), Monthly
+% (9) Climatology forcing (365 days), Daily
+% (10) Constant forcing
+% (11) Constant forcing (summer)
 
 %%%%% DO NOT EDIT BELOW %%%%%%%%
 xmin = Takeshibounds(3);
@@ -88,24 +89,26 @@ ERA_interim_misom_grid_stress_annual_withleapyears
 end
 
 if ForcingType == 1
-do_ISOM_sbc_nc_daily_v2
+do_ISOM_sbc_nc_daily_IAF_yearlyfiles.m
 elseif ForcingType == 2
-do_ISOM_sbc_nc_daily_1file_v1
+do_ISOM_sbc_nc_daily_IAF.m
 elseif ForcingType == 3
-do_ISOM_sbc_nc_monthly_1file_v2
+do_ISOM_sbc_nc_daily_IAF_separatefrc.m
 elseif ForcingType == 4
-do_ISOM_sbc_nc_monthly_clima
+do_ISOM_sbc_nc_monthly_1file_v2
 elseif ForcingType == 5
-do_ISOM_sbc_nc_monthly_clima_364DayYr
+do_ISOM_sbc_nc_monthly_clima
 elseif ForcingType == 6
-do_ISOM_sbc_nc_daily_clima_364DayYr
+do_ISOM_sbc_nc_monthly_clima_364DayYr
 elseif ForcingType == 7
-do_ISOM_sbc_nc_monthly_clima_365DayYr
+do_ISOM_sbc_nc_daily_clima_364DayYr
 elseif ForcingType == 8
-do_ISOM_sbc_nc_daily_clima_365DayYr
+do_ISOM_sbc_nc_monthly_clima_365DayYr
 elseif ForcingType == 9
-do_ISOM_sbc_nc_monthly_AvState
+do_ISOM_sbc_nc_daily_clima_365DayYr
 elseif ForcingType == 10
+do_ISOM_sbc_nc_monthly_AvState
+elseif ForcingType == 11
 do_ISOM_sbc_nc_monthly_AvState_summer
 end
 
