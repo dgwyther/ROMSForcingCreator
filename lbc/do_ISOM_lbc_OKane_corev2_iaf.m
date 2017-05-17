@@ -1,23 +1,24 @@
-YearLength=365;
+YearLength=365; %days
+
 % Load OKane-CORE data
-load(['OKane-COREv1_iaf_salt_',RunName,'.mat'])
-load(['OKane-COREv1_iaf_theta_',RunName,'.mat'])
-load(['OKane-COREv1_iaf_uvel_',RunName,'.mat'])
-load(['OKane-COREv1_iaf_vvel_',RunName,'.mat'])
+load(['OKane-COREv2_iaf_salt_',RunName,'.mat'])
+load(['OKane-COREv2_iaf_theta_',RunName,'.mat'])
+load(['OKane-COREv2_iaf_uvel_',RunName,'.mat'])
+load(['OKane-COREv2_iaf_vvel_',RunName,'.mat'])
 
 theta(theta < -10) = NaN;
 salt(salt < 0) = NaN;
 
-LATITUDE=ncread(['/ds/projects/iomp/obs/TOK/CORE1_data/ocean_month_1800-1899_temp_95E-135E_50S-70S.nc'],'yt_ocean');
-LONGITUDE=ncread(['/ds/projects/iomp/obs/TOK/CORE1_data/ocean_month_1800-1899_temp_95E-135E_50S-70S.nc'],'xt_ocean');
-DEPTHS=ncread(['/ds/projects/iomp/obs/TOK/CORE1_data/ocean_month_1800-1899_temp_95E-135E_50S-70S.nc'],'st_ocean');
-LATITUDEu=ncread(['/ds/projects/iomp/obs/TOK/CORE1_data/ocean_month_1800-1899_u_95E-135E_50S-70S.nc'],'yu_ocean');
-LONGITUDEu=ncread(['/ds/projects/iomp/obs/TOK/CORE1_data/ocean_month_1800-1899_u_95E-135E_50S-70S.nc'],'xu_ocean');
-LATITUDEv=ncread(['/ds/projects/iomp/obs/TOK/CORE1_data/ocean_month_1800-1899_v_95E-135E_50S-70S.nc'],'yu_ocean');
-LONGITUDEv=ncread(['/ds/projects/iomp/obs/TOK/CORE1_data/ocean_month_1800-1899_v_95E-135E_50S-70S.nc'],'xu_ocean');
+LATITUDE=ncread(['/ds/projects/iomp/obs/TOK/CORE2_data/ocean_month_temp_95E-135E_50S-70S.nc'],'yt_ocean');
+LONGITUDE=ncread(['/ds/projects/iomp/obs/TOK/CORE2_data/ocean_month_temp_95E-135E_50S-70S.nc'],'xt_ocean');
+DEPTHS=ncread(['/ds/projects/iomp/obs/TOK/CORE2_data/ocean_month_temp_95E-135E_50S-70S.nc'],'st_ocean');
+LATITUDEu=ncread(['/ds/projects/iomp/obs/TOK/CORE2_data/ocean_month_u_95E-135E_50S-70S.nc'],'yu_ocean');
+LONGITUDEu=ncread(['/ds/projects/iomp/obs/TOK/CORE2_data/ocean_month_u_95E-135E_50S-70S.nc'],'xu_ocean');
+LATITUDEv=ncread(['/ds/projects/iomp/obs/TOK/CORE2_data/ocean_month_v_95E-135E_50S-70S.nc'],'yu_ocean');
+LONGITUDEv=ncread(['/ds/projects/iomp/obs/TOK/CORE2_data/ocean_month_v_95E-135E_50S-70S.nc'],'xu_ocean');
 
 
-time=ncread(['/ds/projects/iomp/obs/TOK/CORE1_data/ocean_month_1800-1899_temp_95E-135E_50S-70S.nc'],'time');
+time=ncread(['/ds/projects/iomp/obs/TOK/CORE2_data/ocean_month_temp_95E-135E_50S-70S.nc'],'time');
 
 %% Calculate vertical levels:
 %ncload(grdname,'h','zice','lat_rho','lon_rho','mask_rho','mask_zice')
@@ -103,4 +104,4 @@ save isfc_OKane-CORE_iaf.mat isfc -v7.3
 
 
 
-do_ISOM_lbc_nc_OKane_core(bryname,grdname,'Lateral Boundaries Salt and Temp',[0 1 1 1],Vtransform, Vstretching, Tcline, theta_s,theta_b,20,N,[(YearLength/12/2):30.4375:(YearLength/12*12)*100-(YearLength/12/2)],[YearLength/12*12*100],'clobber')
+do_ISOM_lbc_nc_OKane_core(bryname,grdname,'Lateral Boundaries Salt and Temp',[0 1 1 1],Vtransform, Vstretching, Tcline, theta_s,theta_b,20,N,[(YearLength/12/2):YearLength/12:(YearLength/12*12)*59-(YearLength/12/2)],[YearLength/12*12*59],'clobber')

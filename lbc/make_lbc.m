@@ -6,13 +6,13 @@
 % 2015-Dec-01:   Updated to remove a bunch of redundant features
 
 %addpath(genpath('/ds/projects/iomp/matlab_scripts'))
-grdname = '/mnt/IceOceanVolume/aisom004/grid/aisom004_grd.nc'; %grid name
+grdname = '/ds/projects/iomp/totten/ana/dgwyther/tisom009/grid/tisom008_canal_grd.nc'; %grid name
 %bryname = '/ds/projects/iomp/aisom/ana/dgwyther/grid/aisom002/aisom002_bry.nc'; %output filename.
-bryname = 'aisom004_cube92-3day_bry.nc';
-MinYear = 1992;
-MaxYear = 2013;
+bryname = 'tisom010_COREv1Normal_bry.nc';
+MinYear = 1948;
+MaxYear = 2006;
 ECCObounds = [210 400 50 125];%as [xmin xmax ymin ymax]; 
-RunName = 'aisom004'
+RunName = 'tisom010'
 
 Vtransform = 2;
 Vstretching = 4;
@@ -25,7 +25,7 @@ N = 31;
 % Totten is [410 525 80 125]; %as [xmin xmax ymin ymax];
 % Amery (new) is [210 400 50 125];
 
-DataProduct = 5; 
+DataProduct = 7; 
 % (1) cube84 repeated 1992 ] deprecated
 % (2) cube84 interannual   ] deprecated
 % (3) cube84 
@@ -36,7 +36,7 @@ DataProduct = 5;
 % (8) O'Kane monthly ocean model (1948-2006) - COREv2 forced
 
 
-ForcingType = 10;
+ForcingType = 13;
 % (1) cube84 repeated 1992 ] deprecated
 % (2) cube84 interannual   ] deprecated
 % (3) cube92 interannual
@@ -49,7 +49,10 @@ ForcingType = 10;
 %(10) cube92-3day climatology
 %(11) ACCIMA 5-km climatology
 %(12) ACCIMA 5-km IAF
-%(13) O'Kane-COREv1 monthly interannual
+%(13) O'Kane-COREv1 monthly interannual (model yrs 1900-2000)
+%(14) O'Kane-COREv1 monthly interannual climatology (model yrs 1900-2000)
+%(15) O'Kane-COREv2 monthly interannual (1948-2006) - COREv2 forced
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 force_id = {'salt','theta','uvel','vvel'}; %load and interp ecco2 data
@@ -123,7 +126,11 @@ elseif ForcingType == 12;
 do_ISOM_lbc_ACCIMA_5km
 elseif ForcingType == 13;
 do_ISOM_lbc_OKane_corev1_iaf
+elseif ForcingType == 14;
+do_ISOM_lbc_OKane_corev1_iaf_clima
 
+elseif ForcingType == 15;
+do_ISOM_lbc_OKane_corev2_iaf
 end
 
 
