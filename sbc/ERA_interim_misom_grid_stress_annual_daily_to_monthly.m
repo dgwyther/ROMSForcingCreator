@@ -5,6 +5,7 @@
 %
 % E Cougnon - Wrote original script for loading ERA data (July 2014)
 % D Gwyther - adapted for 1-daily forcing, some corrections and alterations to fit in my BC creator framework (dec 2014)
+%	May 2017
 %
 %%
 
@@ -17,16 +18,10 @@ ncload(grdname,'lon_rho','lat_rho','angle','mask_rho')
 NumYears = MaxYear-MinYear+1;
 SamRate = 1;% Sampling per day -- 2daily for ERA interim
 
-% choose a smaller region for the Mertz
-%Imin_ERAi = 86;
-%Imax_ERAi = 108;
-%Jmin_ERAi = 101; 
-%Jmax_ERAi = 107;
-Imin_ERAi = 10; %lonmin
-Imax_ERAi = 130;
-Jmin_ERAi = 20; %latmin
-Jmax_ERAi = 61;
-
+Imin_ERAi = Imin_wind; %lonmin
+Imax_ERAi = Imax_wind;
+Jmin_ERAi = Jmin_wind; %latmin
+Jmax_ERAi = Jmax_wind;
 
 
 disp('loading ERA-interim data')

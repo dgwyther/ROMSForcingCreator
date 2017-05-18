@@ -101,5 +101,5 @@ for jj = 1:MonthNumber;
 end
 
 disp('Saving gridded Heat/Salt fluxes')
-save([WorkingDir,ModelName,RunNo,'_air_sea_fluxes_monthly.mat'],'shfluxGrid','ssfluxGrid','-v7.3')
+save([RunName,'_air_sea_fluxes_monthly.mat'],'shfluxGrid','ssfluxGrid','-v7.3')
 disp('Saved.')
