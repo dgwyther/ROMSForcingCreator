@@ -110,8 +110,8 @@ end
    % Interpolate each daily data to ROMS grid
 disp(['Interpolating daily data to ROMS grid for ',num2str(YearInd)])
    for ii = 1:size(uw_stress,1);
-       AISuw_stress(ii,:,:) = griddata(longitude(Imin_ERAi:Imax_ERAi),latitude(Jmin_ERAi:Jmax_ERAi),squeeze(uw_stress(ii,:,:)),lon_rho,lat_rho,'cubic');
-       AISvw_stress(ii,:,:) = griddata(longitude(Imin_ERAi:Imax_ERAi),latitude(Jmin_ERAi:Jmax_ERAi),squeeze(vw_stress(ii,:,:)),lon_rho,lat_rho,'cubic');
+       AISuw_stress(ii,:,:) = griddata(longitude,latitude,squeeze(uw_stress(ii,:,:)),lon_rho,lat_rho,'cubic');
+       AISvw_stress(ii,:,:) = griddata(longitude,latitude,squeeze(vw_stress(ii,:,:)),lon_rho,lat_rho,'cubic');
    end
 
    % %% Rotates currents from model domain XI, ETA to north, south grid.

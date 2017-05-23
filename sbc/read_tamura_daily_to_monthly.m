@@ -74,13 +74,13 @@ if 0 %do inpainting of nan values
  end
 elseif 1 %just rename   % no point doing this when below it doesn't want it permuted
 shflux = shfluxtmp;
-ssflux = ssfluxtmp);
+ssflux = ssfluxtmp;
 end
 
 %%
 
 disp('Saving Heat/Salt fluxes from Takeshi''s data')
-save([WorkingDir,ModelName,RunNo,'_Takeshi_subset_monthly.mat'],'shfluxtmp','ssfluxtmp')
+save([RunName,'_Takeshi_subset_monthly.mat'],'shfluxtmp','ssfluxtmp')
 disp('Saved, now gridding to model grid')
 
 fid2 = fopen('/ds/projects/iomp/obs/Tamura_air_sea_fluxes/daily/latlon.data');

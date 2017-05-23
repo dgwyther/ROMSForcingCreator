@@ -95,7 +95,7 @@ do_ISOM_sbc_nc_daily_IAF
 elseif ForcingType == 3
 do_ISOM_sbc_nc_daily_IAF_separatefrc
 elseif ForcingType == 4
-do_ISOM_sbc_nc_monthly_1file_v2
+do_ISOM_sbc_nc_monthly_IAF
 elseif ForcingType == 5
 do_ISOM_sbc_nc_monthly_clima
 elseif ForcingType == 6
