@@ -1,6 +1,6 @@
 %% Make domain
-Xloc = [xmin:xmax]; %lon
-Yloc = [ymin:ymax]; %lat
+Xloc = [xmin xmax]; %lon
+Yloc = [ymin ymax]; %lat
 
 
 
@@ -30,5 +30,5 @@ theta(TimeInd,:,:,:) = permute(ncread(['/ds/projects/iomp/obs/ECCO2/cube92_real/
 
 end
 
-save([WorkingDir,'cube92_iaf_theta_',ModelName,RunNo,'.mat'],'theta','-v7.3')
+save(['cube92_iaf_theta_',RunName,'.mat'],'theta','-v7.3')
 

@@ -1,6 +1,6 @@
 %% Make domain
-Xloc = [xmin:xmax]; %lon
-Yloc = [ymin:ymax]; %lat
+Xloc = [xmin xmax]; %lon
+Yloc = [ymin ymax]; %lat
 
 
 
@@ -30,4 +30,4 @@ uvel(TimeInd,:,:,:) = permute(ncread(['/ds/projects/iomp/obs/ECCO2/cube92_real/U
 
 end
 
-save([WorkingDir,'cube92_iaf_uvel_',ModelName,RunNo,'.mat'],'uvel','-v7.3')
+save(['cube92_iaf_uvel_',RunName,'.mat'],'uvel','-v7.3')

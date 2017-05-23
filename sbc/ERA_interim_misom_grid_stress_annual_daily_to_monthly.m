@@ -5,15 +5,17 @@
 %
 % E Cougnon - Wrote original script for loading ERA data (July 2014)
 % D Gwyther - adapted for 1-daily forcing, some corrections and alterations to fit in my BC creator framework (dec 2014)
-%	May 2017
+%	may 2017	Updates to remove old functions
 %
 %%
 
 addpath('/ds/projects/iomp/matlab_scripts')
-addpath(genpath('/ds/projects/iomp/matlab_scripts/netcdflib')) %script to read ncep data
-
 % Load model grid (grdname from make_sbc.m):
-ncload(grdname,'lon_rho','lat_rho','angle','mask_rho')
+lat_rho=ncread(grdname,'lat_rho')';
+lon_rho=ncread(grdname,'lon_rho')';
+mask_rho=ncread(grdname,'mask_rho')';
+angle=ncread(grdname,'angle')';
+
 
 NumYears = MaxYear-MinYear+1;
 SamRate = 1;% Sampling per day -- 2daily for ERA interim
@@ -24,18 +26,14 @@ Jmin_ERAi = Jmin_wind; %latmin
 Jmax_ERAi = Jmax_wind;
 
 
-disp('loading ERA-interim data')
-%   eval(['ncload /ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2011.2daily.uwinds.nc u10 longitude latitude']);
-%   eval(['ncload /ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2011.2daily.vwinds.nc v10']);
-eval(['ncload /ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.u10.nc u10 longitude latitude']);
-eval(['ncload /ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.v10.nc v10']);
 
-u10=ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.u10.nc','u10');
+disp('loading ERA-interim data')
+u10=ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.u10.nc','u10',[Imin_ERAi Jmin_ERAi 1],[Imax_ERAi-Imin_ERAi+1 Jmax_ERAi-Jmin_ERAi+1 Inf]);
 u10 = permute(u10,[3 2 1]);
-v10=ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.v10.nc','v10');
+v10=ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.v10.nc','v10',[Imin_ERAi Jmin_ERAi 1],[Imax_ERAi-Imin_ERAi+1 Jmax_ERAi-Jmin_ERAi+1 Inf]);
 v10 = permute(v10,[3 2 1]);
-longitude=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.u10.nc','longitude'));
-latitude=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.u10.nc','latitude'));
+longitude=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.u10.nc','longitude',[Imin_ERAi],[Imax_ERAi-Imin_ERAi+1]));
+latitude=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.u10.nc','latitude', [Jmin_ERAi],[Jmax_ERAi-Jmin_ERAi+1]));
 
 
 uwndall=[];
@@ -71,8 +69,8 @@ clear uwnd vwnd uw_stress vw_stress signu signv
 % uw_stress = nan(12,Jmax_ERAi-Jmin_ERAi+1,Imax_ERAi-Imin_ERAi+1);
 % vw_stress = nan(12,Jmax_ERAi-Jmin_ERAi+1,Imax_ERAi-Imin_ERAi+1);
 
- uwnd(:,:,:) = squeeze(u10(u_index:u_index+size(uwnd,1)-1,Jmin_ERAi:Jmax_ERAi,Imin_ERAi:Imax_ERAi));
- vwnd(:,:,:) = squeeze(v10(v_index:v_index+size(vwnd,1)-1,Jmin_ERAi:Jmax_ERAi,Imin_ERAi:Imax_ERAi));
+ uwnd(:,:,:) = squeeze(u10(u_index:u_index+size(uwnd,1)-1,:,:));
+ vwnd(:,:,:) = squeeze(v10(v_index:v_index+size(vwnd,1)-1,:,:));
 disp('upscaling daily -> monthly')
 for ii=1:12;
  if any(YearInd == LeapYears)

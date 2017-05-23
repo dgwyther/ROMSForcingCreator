@@ -72,9 +72,9 @@ if 0 %do inpainting of nan values
     shflux(i,:,:) = inpaint_nans(squeeze(shfluxtmp(:,:,i)),2); % Heat: Watts/m^2
     ssflux(i,:,:) = inpaint_nans(squeeze(ssfluxtmp(:,:,i)),2); % (m/month)/(s/month)*(kg/m^2)  cm/day
  end
-elseif 1 %just rename
-shflux = permute(shfluxtmp,[3 1 2]);
-ssflux = permute(ssfluxtmp,[3 1 2]);
+elseif 1 %just rename   % no point doing this when below it doesn't want it permuted
+shflux = shfluxtmp;
+ssflux = ssfluxtmp);
 end
 
 %%

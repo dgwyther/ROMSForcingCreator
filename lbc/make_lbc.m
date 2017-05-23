@@ -75,6 +75,7 @@ elseif DataProduct == 3
     end
 elseif DataProduct == 4
     for ii = 1:4
+        disp(['loading ' force_id{ii} ' data'])
         eval(['do_load_ecco2_',force_id{ii},'_cube92'])
     end
 elseif DataProduct == 5

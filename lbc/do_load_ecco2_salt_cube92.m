@@ -1,6 +1,6 @@
 %% Make domain
-Xloc = [xmin:xmax]; %lon
-Yloc = [ymin:ymax]; %lat
+Xloc = [xmin xmax]; %lon
+Yloc = [ymin ymax]; %lat
 
 
 
@@ -30,4 +30,4 @@ salt(TimeInd,:,:,:) = permute(ncread(['/ds/projects/iomp/obs/ECCO2/cube92_real/S
 
 end
 
-save([WorkingDir,'cube92_iaf_salt_',ModelName,RunNo,'.mat'],'salt','-v7.3')
+save(['cube92_iaf_salt_',RunName,'.mat'],'salt','-v7.3')
