@@ -6,13 +6,13 @@
 % 2015-Dec-01:   Updated to remove a bunch of redundant features
 
 %addpath(genpath('/ds/projects/iomp/matlab_scripts'))
-grdname = '/ds/projects/iomp/totten/ana/dgwyther/tisom009/grid/tisom008_canal_grd.nc'; %grid name
+grdname = '../grid/tisom008_canal_grd.nc'; %grid name
 %bryname = '/ds/projects/iomp/aisom/ana/dgwyther/grid/aisom002/aisom002_bry.nc'; %output filename.
-bryname = 'tisom010_COREv1Normal_bry.nc';
-MinYear = 1948;
-MaxYear = 2006;
-ECCObounds = [210 400 50 125];%as [xmin xmax ymin ymax]; 
-RunName = 'tisom010'
+bryname = 'tisom015_Cube92Mon1995_bry.nc';
+MinYear = 1995;
+MaxYear = 1995;
+ECCObounds = [410 525 80 125];%as [xmin xmax ymin ymax]; 
+RunName = 'tisom015'
 
 Vtransform = 2;
 Vstretching = 4;
@@ -25,18 +25,19 @@ N = 31;
 % Totten is [410 525 80 125]; %as [xmin xmax ymin ymax];
 % Amery (new) is [210 400 50 125];
 
-DataProduct = 7; 
+DataProduct = 5; 
 % (1) cube84 repeated 1992 ] deprecated
 % (2) cube84 interannual   ] deprecated
 % (3) cube84 
 % (4) cube92 monthly
-% (5) cube92 3-daily
-% (6) Dinniman ACCIMA 5-km
-% (7) O'Kane monthly ocean model (100 normal years) - COREv1 forced
-% (8) O'Kane monthly ocean model (1948-2006) - COREv2 forced
+% (5) cube92 monthly 1995
+% (6) cube92 3-daily
+% (7) Dinniman ACCIMA 5-km
+% (8) O'Kane monthly ocean model (100 normal years) - COREv1 forced
+% (9) O'Kane monthly ocean model (1948-2006) - COREv2 forced
 
 
-ForcingType = 13;
+ForcingType = 3;
 % (1) cube84 repeated 1992 ] deprecated
 % (2) cube84 interannual   ] deprecated
 % (3) cube92 interannual w/ 365 day year
@@ -80,17 +81,22 @@ elseif DataProduct == 4
     end
 elseif DataProduct == 5
     for ii = 1:4
-        eval(['do_load_ecco2_',force_id{ii},'_cube92_3day'])
+        disp(['loading ' force_id{ii} ' data'])
+        eval(['do_load_ecco2_',force_id{ii},'_cube92_1Year'])
     end
 elseif DataProduct == 6
     for ii = 1:4
-        eval(['do_load_ACCIMA_',force_id{ii},'_5km'])
+        eval(['do_load_ecco2_',force_id{ii},'_cube92_3day'])
     end
 elseif DataProduct == 7
     for ii = 1:4
-        eval(['do_load_OKane_',force_id{ii},'_corev1'])
+        eval(['do_load_ACCIMA_',force_id{ii},'_5km'])
     end
 elseif DataProduct == 8
+    for ii = 1:4
+        eval(['do_load_OKane_',force_id{ii},'_corev1'])
+    end
+elseif DataProduct == 9
     for ii = 1:4
         eval(['do_load_OKane_',force_id{ii},'_corev2'])
     end
@@ -129,7 +135,6 @@ elseif ForcingType == 13;
 do_ISOM_lbc_OKane_corev1_iaf
 elseif ForcingType == 14;
 do_ISOM_lbc_OKane_corev1_iaf_clima
-
 elseif ForcingType == 15;
 do_ISOM_lbc_OKane_corev2_iaf
 end
