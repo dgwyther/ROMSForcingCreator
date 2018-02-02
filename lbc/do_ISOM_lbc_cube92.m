@@ -12,10 +12,9 @@ salt(salt < 0) = NaN;
 
 % Find nearest indexes for locations:
 %ncload /u/crcdata/ECCO2/cube84/THETA/THETA.1440x720x50.001.nc LATITUDE_T LONGITUDE_T DEPTH_T
-LATITUDE_T = ncread('/ds/projects/iomp/obs/ECCO2/cube92_real/THETA_monthly.nc/THETA.1440x720x50.199201.nc','LATITUDE_T')';
-LONGITUDE_T = ncread('/ds/projects/iomp/obs/ECCO2/cube92_real/THETA_monthly.nc/THETA.1440x720x50.199201.nc','LONGITUDE_T')';
-DEPTH_T = ncread('/ds/projects/iomp/obs/ECCO2/cube92_real/THETA_monthly.nc/THETA.1440x720x50.199201.nc','DEPTH_T')';
-
+LATITUDE_T = ncread('/ds/projects/iomp/obs/ECCO2/cube92_real/THETA.nc/THETA.1440x720x50.19920102.nc','LATITUDE_T')';
+LONGITUDE_T = ncread('/ds/projects/iomp/obs/ECCO2/cube92_real/THETA.nc/THETA.1440x720x50.19920102.nc','LONGITUDE_T')';
+DEPTH_T = ncread('/ds/projects/iomp/obs/ECCO2/cube92_real/THETA.nc/THETA.1440x720x50.19920102.nc','DEPTH_T')';
 [lons lats] = meshgrid(LONGITUDE_T,LATITUDE_T);
 
 depth = DEPTH_T;

@@ -281,8 +281,18 @@ resss = 0.5;
 bathymetry = s.zb;
 s.mi(s.mi+s.mw == 1) = 0;
 ice_draft = s.zd.*s.mi;
+addpath(genpath('/ds/projects/iomp/matlab_scripts/ROMS_MATLAB'))
 
+bathy_presmooth=bathymetry;
 bathymetry = smoothgrid(bathymetry,ones(size(s.mw)),min_depth,max_depth,resss,1,2).*s.mw;
+bathy_smooth1 = bathymetry;
+bathymetry = smooth_bathy(bathymetry,s.mw,2,.35);
+bathy_smooth2 = bathymetry;
+figure
+subaxis(1,2,1)
+flat_pcolor(geogrid_lon,geogrid_lat,bathymetry_smooth1-bathymetry_presmooth),colorbar
+subaxis(1,2,2)
+flat_pcolor(geogrid_lon,geogrid_lat,bathymetry_smooth2-bathymetry_presmooth),colorbar
 
 raw_s.blahblah = bathymetry;
 

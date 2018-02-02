@@ -25,18 +25,21 @@ N = 31;
 % Totten is [410 525 80 125]; %as [xmin xmax ymin ymax];
 % Amery (new) is [210 400 50 125];
 
-DataProduct = 7; 
+DataProduct = 'cube92 monthly from 3-daily';
+%% options:
 % (1) cube84 repeated 1992 ] deprecated
 % (2) cube84 interannual   ] deprecated
 % (3) cube84 
 % (4) cube92 monthly
-% (5) cube92 3-daily
-% (6) Dinniman ACCIMA 5-km
-% (7) O'Kane monthly ocean model (100 normal years) - COREv1 forced
-% (8) O'Kane monthly ocean model (1948-2006) - COREv2 forced
+% (5) cube92 monthly 1995
+% (6) cube92 3-daily
+% (7) cube92 monthly from 3-daily
+% (8) Dinniman ACCIMA 5-km
+% (9) O'Kane monthly ocean model COREv1  ((100 normal years) - COREv1 forced)
+% (10) O'Kane monthly ocean model COREv2  ((1948-2006) - COREv2 forced)
 
 
-ForcingType = 13;
+ForcingType = 3;
 % (1) cube84 repeated 1992 ] deprecated
 % (2) cube84 interannual   ] deprecated
 % (3) cube92 interannual w/ 365 day year
@@ -61,41 +64,53 @@ xmax = ECCObounds(2);
 ymin = ECCObounds(3); 
 ymax = ECCObounds(4); 
 
-if DataProduct == 1
+if strcmp(DataProduct,'cube84 repeated 1992')
     for ii = 1:4
         eval(['do_interp_ecco2_',force_id{ii},'_1yrforcing_A'])
     end
-elseif DataProduct == 2 
+elseif strcmp(DataProduct,'cube84 interannual')
     for ii = 1:4
         eval(['do_interp_ecco2_',force_id{ii},'_A'])
-    end  
-elseif DataProduct == 3
+    end
+elseif strcmp(DataProduct,'cube84')
     for ii = 1:4
         eval(['do_load_ecco2_',force_id{ii},'_cube84'])
     end
-elseif DataProduct == 4
+elseif strcmp(DataProduct,'cube92 monthly')
     for ii = 1:4
         disp(['loading ' force_id{ii} ' data'])
         eval(['do_load_ecco2_',force_id{ii},'_cube92'])
     end
-elseif DataProduct == 5
+elseif strcmp(DataProduct,'cube92 monthly 1995')
+    for ii = 1:4
+        disp(['loading ' force_id{ii} ' data'])
+        eval(['do_load_ecco2_',force_id{ii},'_cube92_1Year'])
+    end
+elseif strcmp(DataProduct,'cube92 3-daily')
     for ii = 1:4
         eval(['do_load_ecco2_',force_id{ii},'_cube92_3day'])
     end
-elseif DataProduct == 6
+elseif strcmp(DataProduct,'cube92 monthly from 3-daily')
+    for ii = 1:4
+        disp(['loading ' force_id{ii} ' data'])
+        eval(['do_load_ecco2_',force_id{ii},'_cube92_3day_monthly'])
+    end
+elseif strcmp(DataProduct,'Dinniman ACCIMA 5km')
     for ii = 1:4
         eval(['do_load_ACCIMA_',force_id{ii},'_5km'])
     end
-elseif DataProduct == 7
+elseif strcmp(DataProduct,'O''Kane monthly ocean model COREv1')
     for ii = 1:4
         eval(['do_load_OKane_',force_id{ii},'_corev1'])
     end
-elseif DataProduct == 8
+elseif strcmp(DataProduct,'O''Kane monthly ocean model COREv2')
     for ii = 1:4
         eval(['do_load_OKane_',force_id{ii},'_corev2'])
     end
-
+else
+disp(['your choice of ',DataProduct,' doesn''t match the list'])
 end
+disp(['Your data product is ',DataProduct])
 
 %% REGRID ECCO2 TO MODEL & run do_*isom_lbc.m
 xmin = ECCObounds(1); 
@@ -129,7 +144,6 @@ elseif ForcingType == 13;
 do_ISOM_lbc_OKane_corev1_iaf
 elseif ForcingType == 14;
 do_ISOM_lbc_OKane_corev1_iaf_clima
-
 elseif ForcingType == 15;
 do_ISOM_lbc_OKane_corev2_iaf
 end

@@ -24,13 +24,12 @@ Jmax_ERAi = Jmax_wind;
 
 
 disp('loading ERA-interim data')
-u10=ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.u10.nc','u10',[Imin_ERAi Jmin_ERAi 1],[Imax_ERAi-Imin_ERAi+1 Jmax_ERAi-Jmin_ERAi+1 Inf]);
+u10=ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','u10',[Imin_ERAi Jmin_ERAi 1],[Imax_ERAi-Imin_ERAi+1 Jmax_ERAi-Jmin_ERAi+1 Inf]);
 u10 = permute(u10,[3 2 1]);
-v10=ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.v10.nc','v10',[Imin_ERAi Jmin_ERAi 1],[Imax_ERAi-Imin_ERAi+1 Jmax_ERAi-Jmin_ERAi+1 Inf]);
+v10=ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','v10',[Imin_ERAi Jmin_ERAi 1],[Imax_ERAi-Imin_ERAi+1 Jmax_ERAi-Jmin_ERAi+1 Inf]);
 v10 = permute(v10,[3 2 1]);
-longitude=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.u10.nc','longitude',[Imin_ERAi],[Imax_ERAi-Imin_ERAi+1]));
-latitude=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2014.1daily.u10.nc','latitude', [Jmin_ERAi],[Jmax_ERAi-Jmin_ERAi+1]));
-
+longitude=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','longitude',[Imin_ERAi],[Imax_ERAi-Imin_ERAi+1]));
+latitude=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','latitude', [Jmin_ERAi],[Jmax_ERAi-Jmin_ERAi+1]));
 
 uwndall=[];
 vwndall=[];

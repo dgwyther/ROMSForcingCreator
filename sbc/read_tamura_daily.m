@@ -41,7 +41,7 @@ for YearInd = MinYear:MaxYear; %1992:2007;
    dms = DaysPerMonth(MonthInd);
   end
 
-    display(['Reading in GrADS data ' num2str(YearInd),' ',Month(MonthInd,:),' ...']);
+    display(['Reading in GrADS data ' num2str(YearInd),' ',Month(MonthInd,:),' at ' datestr(now)]);
     eval(['fid = fopen(''/ds/projects/iomp/obs/Tamura_air_sea_fluxes/daily_latest/TSDM2hb_' num2str(YearInd),'_',Month(MonthInd,:),'.data'',''r'');']),
     if YearInd < 2002 %See readme file -- data from 1992 to 2002 -- 9 variables (ERA40, ERA-interim and NCEP2) while > 2002 only 6 variables (ERA-interim and NCEP2)
         tmp = reshape(fread(fid,721*721*dms*9,'float32=>double'),721,721,9,dms);
@@ -148,6 +148,8 @@ for ii=find(feb29_index)'%loop through feb-29 indices
 shfluxClima_tmp(ii,:,:)=[]; %remove feb29 values
 ssfluxClima_tmp(ii,:,:)=[]; %remove feb29 values
 end
+shfluxGrid=shfluxClima_tmp;
+ssfluxGrid=ssfluxClima_tmp;
 
 disp('Saving gridded Heat/Salt fluxes')
 save([RunName,'_air_sea_fluxes_daily.mat'],'shfluxGrid','ssfluxGrid','-v7.3')
