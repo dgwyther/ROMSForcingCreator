@@ -6,11 +6,11 @@
 % 2015-Dec-01:   Updated to remove a bunch of redundant features
 
 %addpath(genpath('/ds/projects/iomp/matlab_scripts'))
-grdname = '../grid/tisom008_canal_grd.nc'; %grid name
+grdname = '../../tisom008_canal_grd.nc'; %grid name
 %bryname = '/ds/projects/iomp/aisom/ana/dgwyther/grid/aisom002/aisom002_bry.nc'; %output filename.
-bryname = 'tisom015_Cube92Mon1995_bry.nc';
-MinYear = 1995;
-MaxYear = 1995;
+bryname = 'tisom015_1992-2015clima_bry.nc';
+MinYear = 1992;
+MaxYear = 2015;
 ECCObounds = [410 525 80 125];%as [xmin xmax ymin ymax]; 
 RunName = 'tisom015'
 
@@ -39,7 +39,7 @@ DataProduct = 'cube92 monthly from 3-daily';
 % (10) O'Kane monthly ocean model (1948-2006) - COREv2 forced
 
 
-ForcingType = 3;
+ForcingType = 11;
 % (1) cube84 repeated 1992 ] deprecated
 % (2) cube84 interannual   ] deprecated
 % (3) cube92 interannual w/ 365 day year
@@ -50,11 +50,12 @@ ForcingType = 3;
 % (8) cube84 climatology
 % (9) cube92-3day climatology w/ 364 day year
 %(10) cube92-3day climatology
-%(11) ACCIMA 5-km climatology
-%(12) ACCIMA 5-km IAF
-%(13) O'Kane-COREv1 monthly interannual (model yrs 1900-2000)
-%(14) O'Kane-COREv1 monthly interannual climatology (model yrs 1900-2000)
-%(15) O'Kane-COREv2 monthly interannual (1948-2006) - COREv2 forced
+%(11) cube92-3day(monthly avs) climatology w/ 365 day year
+%(12) ACCIMA 5-km climatology
+%(13) ACCIMA 5-km IAF
+%(14) O'Kane-COREv1 monthly interannual (model yrs 1900-2000)
+%(15) O'Kane-COREv1 monthly interannual climatology (model yrs 1900-2000)
+%(16) O'Kane-COREv2 monthly interannual (1948-2006) - COREv2 forced
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -93,7 +94,7 @@ elseif strcmp(DataProduct,'cube92 3-daily')
     end
 elseif strcmp(DataProduct,'cube92 monthly from 3-daily')
     for ii = 1:4
-        disp(['loading ' force_id{ii} ' data'])
+        disp(['loading ' force_id{ii} ' data at ',datestr(now)])
         eval(['do_load_ecco2_',force_id{ii},'_cube92_3day_monthly'])
     end
 elseif strcmp(DataProduct,'Dinniman ACCIMA 5km')
@@ -128,7 +129,7 @@ do_ISOM_lbc_A
 elseif ForcingType == 3
 do_ISOM_lbc_cube92
 elseif ForcingType == 4
-do_ISOM_lbc_cube92_clima
+do_ISOM_lbc_cube92_clima THIS OPTION SEEMS TO BE MISSING A FILE?
 elseif ForcingType == 5;
 do_ISOM_lbc_cube92_AvState
 elseif ForcingType == 6;
@@ -142,14 +143,16 @@ do_ISOM_lbc_cube92_3day_clima_364DayYr
 elseif ForcingType == 10;
 do_ISOM_lbc_cube92_3day_clima
 elseif ForcingType == 11;
-do_ISOM_lbc_ACCIMA_5km_clima
+do_ISOM_lbc_cube92_3day_monthly_clima
 elseif ForcingType == 12;
-do_ISOM_lbc_ACCIMA_5km
+do_ISOM_lbc_ACCIMA_5km_clima
 elseif ForcingType == 13;
-do_ISOM_lbc_OKane_corev1_iaf
+do_ISOM_lbc_ACCIMA_5km
 elseif ForcingType == 14;
-do_ISOM_lbc_OKane_corev1_iaf_clima
+do_ISOM_lbc_OKane_corev1_iaf
 elseif ForcingType == 15;
+do_ISOM_lbc_OKane_corev1_iaf_clima
+elseif ForcingType == 16;
 do_ISOM_lbc_OKane_corev2_iaf
 end
 
