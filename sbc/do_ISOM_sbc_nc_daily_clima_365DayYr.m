@@ -1,5 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 title =([RunName,'surface heat/salt fluxes and wind stress']); % Make title from model name variable
+HeatFCorrection='yes'
 
 disp('load air sea flux file (big file so load it once and subset later)')
 load([RunName,'_air_sea_fluxes_daily.mat'])
@@ -11,6 +12,17 @@ shfluxClima_tmp=shfluxGrid; clear shfluxGrid
 ssfluxClima_tmp=ssfluxGrid; clear ssfluxGrid
 uwndClima_tmp=u_stress_All; clear u_stress_All
 vwndClima_tmp=v_stress_All; clear v_stress_All
+
+
+disp('correction for heat flux in summer?')
+if strcmp(HeatFCorrection,'yes')
+disp('Yes...')
+shfluxClima_tmp(shfluxClima_tmp>0)=shfluxClima_tmp(shfluxClima_tmp>0)*0.5;
+else
+disp('No.')
+end
+
+disp('Note: the interpolation of NaN regions is calculated after the climatology, leading a slight difference in the NaN regions compared to when there is no climatology calculated')
 
 % reshape into climatology shape (if removal of leap years hasn't happened this will chop to necessary length by ignoring leftover days at end
 shfluxClima_tmp= reshape(shfluxClima_tmp(1:365*(MaxYear-MinYear+1),:,:), [365 (MaxYear-MinYear+1) size(shfluxClima_tmp,2) size(shfluxClima_tmp,3)]);
@@ -144,7 +156,7 @@ rmpath('/ds/projects/iomp/matlab_scripts')
     disp('correct for large summer heat flux')
 
 % Correct Heat flux for large summer values (as per NCEP2 heat flux data)
-shf(shf > 0) = shf(shf > 0)*0.5;
+%shf(shf > 0) = shf(shf > 0)*0.5;
 %swf(swf <=0) = -1e-6;
 
 refSalt = 34.4; % Reference salinity
