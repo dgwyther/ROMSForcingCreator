@@ -97,7 +97,7 @@ shfluxGrid = nan(DayNumber,size(lat_rho,1),size(lat_rho,2));
 for j = 1:DayNumber;
     ssfluxGrid(j,:,:) = griddata(AllLon,AllLat,squeeze(ssflux(j,:,:)),lon_rho,lat_rho,'cubic');
     shfluxGrid(j,:,:) = griddata(AllLon,AllLat,squeeze(shflux(j,:,:)),lon_rho,lat_rho,'cubic');
-if ~rem(j,round(DayNumber/10)), disp(['gridding ',num2str(j/DayNumber*100),' done.']), end
+if ~rem(j,round(DayNumber/10)), disp(['gridding ',num2str(j/DayNumber*100),' done at ' datestr(now)]), end
 end
 
 disp('Saving gridded Heat/Salt fluxes with leap year data')

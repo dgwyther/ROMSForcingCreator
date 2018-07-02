@@ -7,10 +7,10 @@
 
  
 grdname = '../grid/tisom008_canal_grd.nc'; 
-frcname = 'tisom015_daily1995_sbc.nc';
-RunName = 'tisom015';
-MinYear = 1995;
-MaxYear = 1995;
+frcname = 'tisom016_1992IAF_sbc.nc';
+RunName = 'tisom016';
+MinYear = 1992;
+MaxYear = 1992;
 windbounds = [13 124 20 57]; %lonmin lonmax latmin latmax
 Takeshibounds = [410 550 500 640]; %[colmin colmax rowmin rowmax]
 % new Amery flux bounds  [100 352 520 720];
@@ -20,7 +20,7 @@ Takeshibounds = [410 550 500 640]; %[colmin colmax rowmin rowmax]
 % Mertz ERA bounds [86 108 101 107];
 % old Totten CORE bounds [60 80 10 18];
 % new Amery CORE bounds [29 49 7 18];
-FluxType = 3;
+FluxType = 1;
 % (1) daily fluxes (1992-2013) (automatically remove leap year data)
 % (2) daily fluxes averaged to monthly (1992-2013)
 % (3) daily fluxes 1995 
@@ -28,7 +28,7 @@ FluxType = 3;
 % (5) monthly fluxes (1992-2007 only)
 % (6) daily fluxes with leap year data (1992-2013). Be careful converting to climatology
 
-WindType = 7;
+WindType = 4;
 % (1) COREv2 daily->monthly (1992-2007)
 % (2) COREv2 daily (1992-2014)
 % (3) COREv1 normal year (6hrly, 365 days)
@@ -36,9 +36,9 @@ WindType = 7;
 % (5) ERA-interim daily->monthly forcing (1992-2013)
 % (6) ERA-interim daily forcing (1992-2013) with leap year data
 % (7) ERA-interim daily forcing (1995)
+% (8) ERA-interim daily forcing (1992-2017) with sea ice masking
 
-
-ForcingType = 2;
+ForcingType = 3;
 % (1) Interannual forcing Daily, multiple files (1 per year)
 % (2) Interannual forcing Daily, 1 file
 % (3) Interannual forcing Daily, multiple files (1 per forcing type)
@@ -90,6 +90,11 @@ elseif WindType == 6;
 ERA_interim_misom_grid_stress_annual_withleapyears
 elseif WindType == 7;
 ERA_interim_misom_grid_stress_1995
+elseif WindType == 8;
+Tmin_ERAseaice = 1 % 1992-01-01
+Tmax_ERAseaice = daysact('01-jan-1992',  '31-dec-2015')+1 % 2015-12-31 %sea ice data downloaded by DEG (early 2018) had 9497 timesteps: daysact('01-jan-1992',  '31-dec-2017')+1
+StressCd='Lupkes'
+ERA_interim_grid_stress_daily_seaicemask
 end
 
 
