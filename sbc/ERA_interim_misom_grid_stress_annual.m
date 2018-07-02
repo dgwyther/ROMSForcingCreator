@@ -4,6 +4,7 @@
 % E Cougnon - Wrote original script for loading ERA data (July 2014)
 % D Gwyther - adapted for 1-daily forcing, some corrections and alterations to fit in my BC creator framework (dec 2014)
 % D Gwyther - Update to remove old dependencies (apr 2016)
+% D Gwyther - fixed a bug with slecting and gridding ERA data. CRITICAL UPDATE.
 %%
 
 addpath('/ds/projects/iomp/matlab_scripts')
@@ -16,20 +17,30 @@ angle=ncread(grdname,'angle')';
 NumYears = MaxYear-MinYear+1;
 SamRate = 1;% Sampling per day (default for ERA_interim is 1/day)
 
-Imin_ERAi = Imin_wind; %lonmin
-Imax_ERAi = Imax_wind;
-Jmin_ERAi = Jmin_wind; %latmin
-Jmax_ERAi = Jmax_wind;
-
+%Imin_ERAi = Imin_wind; %lonmin
+%Imax_ERAi = Imax_wind;
+%Jmin_ERAi = Jmin_wind; %latmin
+%Jmax_ERAi = Jmax_wind;
 
 
 disp('loading ERA-interim data')
-u10=ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','u10',[Imin_ERAi Jmin_ERAi 1],[Imax_ERAi-Imin_ERAi+1 Jmax_ERAi-Jmin_ERAi+1 Inf]);
+lon_era=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','longitude'));
+lat_era=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','latitude'));
+[~,minloni]= min(abs(lon_era-min(lon_rho(:)))); minloni=minloni-1;
+[~,maxloni]= min(abs(lon_era-max(lon_rho(:)))); maxloni=maxloni+1;
+[~,minlati]= min(abs(lat_era-max(lat_rho(:)))); minlati=minlati-1;
+[~,maxlati]= min(abs(lat_era-min(lat_rho(:)))); maxlati=maxlati+1;
+
+u10=ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','u10',[minloni minlati 1],[maxloni-minloni+1 maxlati-minlati+1 Inf]);
 u10 = permute(u10,[3 2 1]);
-v10=ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','v10',[Imin_ERAi Jmin_ERAi 1],[Imax_ERAi-Imin_ERAi+1 Jmax_ERAi-Jmin_ERAi+1 Inf]);
-v10 = permute(v10,[3 2 1]);
-longitude=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','longitude',[Imin_ERAi],[Imax_ERAi-Imin_ERAi+1]));
-latitude=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','latitude', [Jmin_ERAi],[Jmax_ERAi-Jmin_ERAi+1]));
+v10=ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','v10',[minloni minlati 1],[maxloni-minloni+1 maxlati-minlati+1 Inf]);
+v10 = permute(v10,[3 2 1]); %permute to [time lat lon]
+longitude=lon_era(minloni:maxloni);
+latitude =lat_era(minlati:maxlati);
+[LONGITUDE,LATITUDE]=meshgrid(longitude,latitude);
+%longitude=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','longitude',[Imin_ERAi],[Imax_ERAi-Imin_ERAi+1]));
+%latitude=double(ncread('/ds/projects/iomp/obs/ERA_Interim/ERA_Interim_1992_2016_1daily.u10.v10.nc','latitude', [Jmin_ERAi],[Jmax_ERAi-Jmin_ERAi+1]));
+
 
 uwndall=[];
 vwndall=[];
@@ -43,16 +54,16 @@ for YearInd = MinYear:MaxYear;
 clear uwnd vwnd uw_stress vw_stress signu signv
  if any(YearInd == LeapYears)
           % allocate space for matrix for daily data for one year
-  uwnd = nan(366*SamRate,Jmax_ERAi-Jmin_ERAi+1,Imax_ERAi-Imin_ERAi+1);
-  vwnd = nan(366*SamRate,Jmax_ERAi-Jmin_ERAi+1,Imax_ERAi-Imin_ERAi+1);
-  uw_stress = nan(366,Jmax_ERAi-Jmin_ERAi+1,Imax_ERAi-Imin_ERAi+1);
-  vw_stress = nan(366,Jmax_ERAi-Jmin_ERAi+1,Imax_ERAi-Imin_ERAi+1);          
+  uwnd = nan(366*SamRate,maxlati-minlati+1,maxloni-minloni+1);
+  vwnd = nan(366*SamRate,maxlati-minlati+1,maxloni-minloni+1);
+  uw_stress = nan(366,maxlati-minlati+1,maxloni-minloni+1);
+  vw_stress = nan(366,maxlati-minlati+1,maxloni-minloni+1);          
  else
           % allocate space for matrix for daily data for one year
-  uwnd = nan(365*SamRate,Jmax_ERAi-Jmin_ERAi+1,Imax_ERAi-Imin_ERAi+1);
-  vwnd = nan(365*SamRate,Jmax_ERAi-Jmin_ERAi+1,Imax_ERAi-Imin_ERAi+1);
-  uw_stress = nan(365,Jmax_ERAi-Jmin_ERAi+1,Imax_ERAi-Imin_ERAi+1);
-  vw_stress = nan(365,Jmax_ERAi-Jmin_ERAi+1,Imax_ERAi-Imin_ERAi+1);
+  uwnd = nan(365*SamRate,maxlati-minlati+1,maxloni-minloni+1);
+  vwnd = nan(365*SamRate,maxlati-minlati+1,maxloni-minloni+1);
+  uw_stress = nan(365,maxlati-minlati+1,maxloni-minloni+1);
+  vw_stress = nan(365,maxlati-minlati+1,maxloni-minloni+1);
  end
 
  uwnd(:,:,:) = squeeze(u10(u_index:u_index+size(uwnd,1)-1,:,:));
@@ -87,8 +98,8 @@ end
    % Interpolate each daily data to ROMS grid
 disp(['Interpolating daily data to ROMS grid for ',num2str(YearInd)])
    for ii = 1:size(uw_stress,1);
-       AISuw_stress(ii,:,:) = griddata(longitude,latitude,squeeze(uw_stress(ii,:,:)),lon_rho,lat_rho,'cubic');
-       AISvw_stress(ii,:,:) = griddata(longitude,latitude,squeeze(vw_stress(ii,:,:)),lon_rho,lat_rho,'cubic');
+       AISuw_stress(ii,:,:) = griddata(LONGITUDE,LATITUDE,squeeze(uw_stress(ii,:,:)),lon_rho,lat_rho,'cubic');
+       AISvw_stress(ii,:,:) = griddata(LONGITUDE,LATITUDE,squeeze(vw_stress(ii,:,:)),lon_rho,lat_rho,'cubic');
    end
 
    % %% Rotates currents from model domain XI, ETA to north, south grid.
@@ -115,7 +126,6 @@ disp(['Interpolating daily data to ROMS grid for ',num2str(YearInd)])
    v_stress=AISvw_stress;
    u_stress_All(u_index:u_index+size(uwnd,1)-1,:,:) = AISuw_stress;
    v_stress_All(v_index:v_index+size(vwnd,1)-1,:,:) = AISvw_stress;
-
 
    disp(['Saving u_stress and v_stress for ' num2str(YearInd) ''])
    % save u and v component with the model grid, and a vector rotation
