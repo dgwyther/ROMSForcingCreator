@@ -141,7 +141,7 @@ temporary=permute(shf,[3 2 1]);
 pause(15), ('saving shflux to netcdf')
 netcdf.putVar(id, shflux_id, temporary);% (W/m^2)
 elseif tt==4,
-temporary=permute(-swf./refSalt*100,[3 2 1]);
+temporary=permute(swf./refSalt*100,[3 2 1]);
 pause(15)
 netcdf.putVar(id, swflux_id, temporary); 
 end% kg/m^2->cm day^-1

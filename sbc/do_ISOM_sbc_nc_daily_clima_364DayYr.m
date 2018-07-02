@@ -156,7 +156,7 @@ dm = 365.25/12; % Days in a month (365.25days/12 months):
 
 
 netcdf.putVar(id, shflux_id, permute(shf,[3 2 1]));% (W/m^2)
-netcdf.putVar(id, swflux_id, permute(-swf./refSalt*100,[3 2 1]));% kg/m^2->cm day^-1
+netcdf.putVar(id, swflux_id, permute(swf./refSalt*100,[3 2 1]));% kg/m^2->cm day^-1
 
     disp('Write wind variables')
 

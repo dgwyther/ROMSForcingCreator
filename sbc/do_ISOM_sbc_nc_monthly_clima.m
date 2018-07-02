@@ -312,7 +312,7 @@ refSalt = 34.4; % Reference salinity
 dm = 365.25/12; % Days in a month (365.25days/12 months):
 
 nw{'shflux'}(:,:,:) = shf; % (W/m^2)
-nw{'swflux'}(:,:,:) = -swf./refSalt/dm*100; % convert swf kg/m2/month to (cm/m2/day)
+nw{'swflux'}(:,:,:) = swf./refSalt/dm*100; % convert swf kg/m2/month to (cm/m2/day)
 
     disp('Write wind variables')
 
