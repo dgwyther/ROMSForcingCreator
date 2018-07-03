@@ -10,11 +10,11 @@ frcname = 'tisom009_tides.nc';
 addpath(genpath('/ds/projects/iomp/matlab_scripts/TMD2.03'))
 %addpath(genpath('/ds/projects/iomp/matlab_scripts/netcdflib')) 
 
-h = ncread(grdname,'h')';
-lat_rho=ncread(grdname,'lat_rho')';
-lon_rho=ncread(grdname,'lon_rho')';
-mask_rho=ncread(grdname,'mask_rho')';
-mask_zice=ncread(grdname,'mask_zice')';
+h = ncread(grdname,'h');
+lat_rho=ncread(grdname,'lat_rho');
+lon_rho=ncread(grdname,'lon_rho');
+mask_rho=ncread(grdname,'mask_rho');
+mask_zice=ncread(grdname,'mask_zice');
 
 [m n] = size(lat_rho);
 Hph = NaN(10,m,n);
@@ -40,7 +40,6 @@ frc_title = 'Tidal Forcing';
 vars = {'z'}; %,'u','v'};
 constituents  = {'m2','s2','n2','k2','k1','o1','p1','q1','mm','mf'};
 
-%[x,y,h,ma,labels] = roms_grid(grid);
 [pp qq] = size(h);
 n_constituents     = length(constituents);
 tidal_constituents = [];
@@ -100,6 +99,7 @@ if 1 % only force boundaries
  tmask(:,qq) = 1; %tmask(:,qq-1) = 1;
  tmask(1,:) = 1; %tmask(2,:) = 1;
  tmask(pp,:) = 1; %tmask(pp-1,:) = 1;
+ mask_rho(mask_zice == 1) = 0; % don't force under ice shelves
 elseif 0 % force whole surface
 mask_zice = ncread(grdname,'mask_zice')';
 tmask = ones(pp,qq);
@@ -121,11 +121,11 @@ for n=1:n_constituents;
 %   vvp = squeeze(Gv(n,:,:)); 
 
   iza = find(isnan(zza(:)) == 0);
-  izx = x(iza); izy =y(iza); izz = zza(iza);
+  izx = lon_rho(iza); izy =lat_rho(iza); izz = zza(iza);
   zamp(:,:,n) = griddata(izx,izy,izz,lon_rho,lat_rho,'nearest').*mask_rho.*tmask;
 
   izp = find(isnan(zzp(:)) == 0);
-  izx = x(izp); izy = y(izp); izz = zzp(izp);
+  izx = lon_rho(izp); izy = lat_rho(izp); izz = zzp(izp);
   zpha(:,:,n) = griddata(izx,izy,izz,lon_rho,lat_rho,'nearest').*mask_rho.*tmask;
 
   Tcons(n) = 1/name2freq(constituents{n});
@@ -170,5 +170,15 @@ netcdf.putVar(id, tide_Ephase_id, zpha);
 netcdf.putVar(id, tide_Eamp_id, zamp);
 netcdf.putVar(id, tide_period_id, Tcons);
 
-close(nc);
+netcdf.close(id);
 
+
+%% CHECKS
+%ncid2 = netcdf.open(frcname,'NC_NOWRITE');
+%data_copy = netcdf.getVar(ncid2,1);
+%if isequal(Tcons,data_copy)
+%      disp('Data match');
+%else
+%      disp('Data mis-match');
+%end
+%
