@@ -1,11 +1,17 @@
-grdname = 'aisom004_grd.nc';
+grdname = 'test_grd.nc';
 ModelName = 'Amery Ice Shelf Ocean Model v10';
 
-xc = [56,85]; 
-yc = -[-73.4,-61];
-resolution = 1/10; 
+xc = [104.5,130]; 
+yc = -[-68,-60];
+resolution = 1/30; 
 
 plots = 0;
+
+
+ROMS_Matlab_path = 'C:\Users\odin\Documents\MATLAB\ROMS_MATLAB';
+
+Do_smoothing=1;
+
 
 %xc = [110,130]; %xc totten
 %yc = -[-67.65,-60];%yc totten
@@ -23,17 +29,19 @@ plots = 0;
 
 %-----------------------------------------------------------------------------
 title =([ModelName,' grid file']); % Make title from model name variable
-addpath('/ds/projects/iomp/matlab_scripts')
-addpath('/ds/projects/iomp/matlab_scripts/ROMS_NetCDF')
-addpath(genpath('/ds/projects/iomp/matlab_scripts/netcdflib'))
+%addpath('/ds/projects/iomp/matlab_scripts')
+%addpath('/ds/projects/iomp/matlab_scripts/ROMS_NetCDF')
+%addpath(genpath('/ds/projects/iomp/matlab_scripts/netcdflib'))
 
-read_asaid_islands_HL
+%read_asaid_islands_HL
 
-lon = ncread('/ds/projects/iomp/obs/geom/RTopo105/RTopo105_50S.nc','lon')';
-lat = ncread('/ds/projects/iomp/obs/geom/RTopo105/RTopo105_50S.nc','lat')';
-bathy = double(ncread('/ds/projects/iomp/obs/geom/RTopo105/RTopo105_50S.nc','bathy')');
-amask = double(ncread('/ds/projects/iomp/obs/geom/RTopo105/RTopo105_50S.nc','amask')');
-draft = double(ncread('/ds/projects/iomp/obs/geom/RTopo105/RTopo105_50S.nc','draft')');
+input_data='RTopo105b/RTopo105b_50S.nc';
+
+lon = ncread(input_data,'lon')';
+lat = ncread(input_data,'lat')';
+bathy = double(ncread(input_data,'bathy')');
+amask = double(ncread(input_data,'amask')');
+draft = double(ncread(input_data,'draft')');
 
 [~,xc1]=min(abs(lon-xc(1))); [~,xc2]=min(abs(lon-xc(2)));
 [~,yc1]=min(abs(lat- -yc(1))); [~,yc2]=min(abs(lat- -yc(2)));
@@ -41,8 +49,8 @@ draft = double(ncread('/ds/projects/iomp/obs/geom/RTopo105/RTopo105_50S.nc','dra
 Xrng = [floor(0.95*xc1):floor(1.05*xc2)];
 Yrng = [floor(0.95*yc1):floor(1.05*yc2)]; %done programmatically now, with 5% leeway
 
-load /ds/projects/iomp/obs/geom/RTopo105b/RTopo105_coast.asc
-load /ds/projects/iomp/obs/geom/RTopo105b/RTopo105_gl.asc
+%load /ds/projects/iomp/obs/geom/RTopo105b/RTopo105_coast.asc
+%load /ds/projects/iomp/obs/geom/RTopo105b/RTopo105_gl.asc
 
 [lons lats] = meshgrid(lon,lat);
 e = nan(size(lons));
@@ -54,11 +62,10 @@ e(i,:) = t1';
 n(i,:)= t2';
 end
 
-nhind = find(RTopo105_coast(:,2) >= -60);
-RTopo105_coast(nhind,2) = NaN;
-
-[ecl ncl] = polar_stereo_deluxe(RTopo105_coast(:,2),RTopo105_coast(:,1),0,0,1,-71);
-[egl ngl] = polar_stereo_deluxe(RTopo105_gl(:,2),RTopo105_gl(:,1),0,0,1,-71);
+%nhind = find(RTopo105_coast(:,2) >= -60);
+%RTopo105_coast(nhind,2) = NaN;
+%[ecl ncl] = polar_stereo_deluxe(RTopo105_coast(:,2),RTopo105_coast(:,1),0,0,1,-71);
+%[egl ngl] = polar_stereo_deluxe(RTopo105_gl(:,2),RTopo105_gl(:,1),0,0,1,-71);
 
 % 
 
@@ -96,11 +103,9 @@ plot(pg.x(1:res:end,1:res:end)'/1000,pg.y(1:res:end,1:res:end)'/1000,'-','color'
 plot(pg.x([1,end],[1,end])/1000,pg.y([1,end],[1,end])/1000,'k-');  
 plot(pg.x([1,end],[1:end])'/1000,pg.y([1,end],[1:end])'/1000,'k-');  
 axis([1200 3500 0 2000])
-hold on, plot(ecl,ncl,'k.');   
-plot(egl,ngl,'k.');
+%hold on, plot(ecl,ncl,'k.');   
+%plot(egl,ngl,'k.');
 
-lon_rho=ncread('/ds/projects/iomp/aisom/mdl/aisom001/ais_grdpolarb_truncated.nc','lon_rho')';
-lat_rho=ncread('/ds/projects/iomp/aisom/mdl/aisom001/ais_grdpolarb_truncated.nc','lat_rho')';
 
 [ox,oy]=polar_stereo_deluxe(lat_rho,lon_rho,0,0,1,-71);
 %ox=ox*1000; oy=oy*1000; %km->m
@@ -130,19 +135,10 @@ im = amask(Yrng,Xrng);
 im(im ~= 2) = 0; im(im == 2) = 1;
 
 % Load rtopo grounding line information:
-
-%     pg.delr      = fliplr(pg.delr');
-%     pg.deltheta  = fliplr(pg.deltheta');
-%     pg.cosrx     = fliplr(pg.cosrx');
-%     pg.cosry     = fliplr(pg.cosry');
-%     pg.costhetax = fliplr(pg.costhetax');
-%     pg.costhetay = fliplr(pg.costhetay');
-    pg.h1      = double(-interp2(lons(Yrng,Xrng),lats(Yrng,Xrng),bathy(Yrng,Xrng),pg.lon,pg.lat)); % This is the bathymetry data
-    pg.zice    = double(interp2(lons(Yrng,Xrng),lats(Yrng,Xrng),draft(Yrng,Xrng),pg.lon,pg.lat)); % This is the bathymetry data
-
-    pg.icemask    = double(interp2(lons(Yrng,Xrng),lats(Yrng,Xrng),im,pg.lon,pg.lat,'nearest')); 
-%NEED TO DO
-    pg.watermask = double(interp2(lons(Yrng,Xrng),lats(Yrng,Xrng),wm,pg.lon,pg.lat,'nearest')); %water mask
+pg.h1      = double(-interp2(lons(Yrng,Xrng),lats(Yrng,Xrng),bathy(Yrng,Xrng),pg.lon,pg.lat)); % bathy data
+pg.zice    = double(interp2(lons(Yrng,Xrng),lats(Yrng,Xrng),draft(Yrng,Xrng),pg.lon,pg.lat)); % ice data
+pg.icemask    = double(interp2(lons(Yrng,Xrng),lats(Yrng,Xrng),im,pg.lon,pg.lat,'nearest')); %ice mask
+pg.watermask = double(interp2(lons(Yrng,Xrng),lats(Yrng,Xrng),wm,pg.lon,pg.lat,'nearest')); %water mask
 %% Post loading data editing...
 
 theInterpFcn = 'interp2';
@@ -234,8 +230,6 @@ geogrid_lon = s.lon;
 geogrid_lat = s.lat;
 
 %% Need to calculate dely and delx
-
-%%% NOTE: NOT SURE ABOUT THIS!!
 tempdelx=[];
 tempdely=[];
 s.delx = [];
@@ -267,42 +261,24 @@ projection = 'Mercator';
 % ROMS needs radians.
 min_depth = s.clipping_depths(1);
 max_depth = s.clipping_depths(2);
-%min_depth_ice = 50;
 
 % Smooth bathymetry and icedraft
 raw_s = s;
-resss = 0.5;
-
-%ii = find(s.zd >= -min_depth_ice);
-%s.zd(ii) = -min_depth_ice;
-
-%% Bit more cleaning:
-%s = raw_s;
 bathymetry = s.zb;
+
 s.mi(s.mi+s.mw == 1) = 0;
 ice_draft = s.zd.*s.mi;
-addpath(genpath('/ds/projects/iomp/matlab_scripts/ROMS_MATLAB'))
+addpath(genpath(ROMS_Matlab_path))
 
 bathy_presmooth=bathymetry;
-bathymetry = smoothgrid(bathymetry,ones(size(s.mw)),min_depth,max_depth,resss,1,2).*s.mw;
-bathy_smooth1 = bathymetry;
-bathymetry = smooth_bathy(bathymetry,s.mw,2,.35);
-bathy_smooth2 = bathymetry;
-figure
-subaxis(1,2,1)
-flat_pcolor(geogrid_lon,geogrid_lat,bathymetry_smooth1-bathymetry_presmooth),colorbar
-subaxis(1,2,2)
-flat_pcolor(geogrid_lon,geogrid_lat,bathymetry_smooth2-bathymetry_presmooth),colorbar
-
-raw_s.blahblah = bathymetry;
+bathymetry = smooth_bath(bathymetry,s.mw,2,.35);
 
 % Clip Bathymetry
-
 bathymetry(find(isnan(bathymetry))) = min_depth;
 bathymetry(bathymetry<min_depth) = min_depth;
 bathymetry((bathymetry + ice_draft) > max_depth) = max_depth;
 
-%ice_draft = -smoothgrid(-ice_draft,s.mi,50,1000,resss,1,2);
+ice_draft = -smooth_bath(-ice_draft,s.mi,2,0.35);
 wct = (bathymetry + ice_draft);
 bathymetry(wct.*s.mi < 0) = -ice_draft(wct.*s.mi < 0) + min_depth;
 wct = (bathymetry + ice_draft).*s.mw00;
@@ -431,8 +407,8 @@ netcdf.putAtt(id, el_id, 'units', 'meter');
 %nc{'el'}.long_name = ncchar('domain length in the ETA-direction');
 %nc{'el'}.units = ncchar('meter');
 
-JPRJ_id = netcdf.defVar(id, 'JPRJ', 'char', two_dim);
-netcdf.putAtt(id, JPRJ_id, 'long_name', 'Map projection type');
+%JPRJ_id = netcdf.defVar(id, 'JPRJ', 'char', two_dim);
+%netcdf.putAtt(id, JPRJ_id, 'long_name', 'Map projection type');
 
 %nc{'JPRJ'} = ncchar('two'); %% 2 elements.
 %nc{'JPRJ'}.long_name = ncchar('Map projection type');
@@ -770,62 +746,28 @@ end
 
 % Fill the variables.
 
-% Need (x..., y...) in meters.  Currently, they are
-%  in Mercator (projected) units.
-
-netcdf.putVar(id, JPRJ_id, theProjection);
-netcdf.putVar(id, spherical_id, 'T');
-%nc{'JPRJ'}(:) = theProjection;
-%nc{'spherical'}(:) = 'T';   % T or F -- uppercase okay?
-
 netcdf.putVar(id, xl_id, xl);
 netcdf.putVar(id, el_id, el);
-%nc{'xl'}(:) = xl;
-%nc{'el'}(:) = el;
+
 
 f = 2.*7.29e-5.*sin(geogrid_lat(j_rho, i_rho).*pi./180);
-netcdf.putVar(id, f_id, f);
-%nc{'f'}(1:MP,1:LP) = f;
-
+netcdf.putVar(id, f_id, f');
 netcdf.putVar(id, x_rho_id, grid_x(j_rho, i_rho)');
 netcdf.putVar(id, y_rho_id, grid_y(j_rho, i_rho)');
-%nc{'x_rho'}(1:MP,1:LP) = grid_x(j_rho, i_rho);
-%nc{'y_rho'}(1:MP,1:LP) = grid_y(j_rho, i_rho);
-
 netcdf.putVar(id, x_psi_id, grid_x(j_psi, i_psi)');
 netcdf.putVar(id, y_psi_id, grid_y(j_psi, i_psi)');
-%nc{'x_psi'}(1:M,1:L) = grid_x(j_psi, i_psi);
-%nc{'y_psi'}(1:M,1:L) = grid_y(j_psi, i_psi);
-
 netcdf.putVar(id, x_u_id, grid_x(j_u, i_u)');
 netcdf.putVar(id, y_u_id, grid_y(j_u, i_u)');
-%nc{'x_u'}(1:MP,1:L) = grid_x(j_u, i_u);
-%nc{'y_u'}(1:MP,1:L) = grid_y(j_u, i_u);
-
 netcdf.putVar(id, x_v_id, grid_x(j_v, i_v)');
 netcdf.putVar(id, y_v_id, grid_y(j_v, i_v)');
-%nc{'x_v'}(1:M,1:LP) = grid_x(j_v, i_v);
-%nc{'y_v'}(1:M,1:LP) = grid_y(j_v, i_v);
-
 netcdf.putVar(id, lon_rho_id, geogrid_lon(j_rho, i_rho)');
 netcdf.putVar(id, lat_rho_id, geogrid_lat(j_rho, i_rho)');
-%nc{'lon_rho'}(1:MP,1:LP) = geogrid_lon(j_rho, i_rho);
-%nc{'lat_rho'}(1:MP,1:LP) = geogrid_lat(j_rho, i_rho);
-
 netcdf.putVar(id, lon_psi_id, geogrid_lon(j_psi, i_psi)');
 netcdf.putVar(id, lat_psi_id, geogrid_lat(j_psi, i_psi)');
-%nc{'lon_psi'}(1:M,1:L) = geogrid_lon(j_psi, i_psi);
-%nc{'lat_psi'}(1:M,1:L) = geogrid_lat(j_psi, i_psi);
-
 netcdf.putVar(id, lon_u_id, geogrid_lon(j_u, i_u)');
 netcdf.putVar(id, lat_u_id, geogrid_lat(j_u, i_u)');
-%nc{'lon_u'}(1:MP,1:L) = geogrid_lon(j_u, i_u);
-%nc{'lat_u'}(1:MP,1:L) = geogrid_lat(j_u, i_u);
-
 netcdf.putVar(id, lon_v_id, geogrid_lon(j_v, i_v)');
 netcdf.putVar(id, lat_v_id, geogrid_lat(j_v, i_v)');
-%nc{'lon_v'}(1:M,1:LP) = geogrid_lon(j_v, i_v);
-%nc{'lat_v'}(1:M,1:LP) = geogrid_lat(j_v, i_v);
 
 % Masking.
 
@@ -914,52 +856,15 @@ netcdf.putVar(id, angle_id, ang(j_rho, i_rho)');
 % Note: need half the number of points.
 
 gx = geometry{1};   % Spherical distances in meters.
-
 gy = geometry{2};
-
-% raw_grid_size = [m, n]
-
-% geometry_sizes = [size(gx) size(gy)]
-
-% sx = 0.5*(gx(1:end-1, :) + gx(2:end, :));
-% sy = 0.5*(gy(:, 1:end-1) + gy(:, 2:end));
-
-% raw_s_sizes = [size(sx) size(sy)]
-
-% sx = sx(2:end-1, :);
-% sy = sy(:, 2:end-1);
 
 pm = 1 ./ gx;
 pn = 1 ./ gy;
 
 
-% Look for CFL violations
-
-dx =  min(gx,gy);
-grav = 9.81;
-
-%WCT = (pg.h1+pg.zice); %use wct and mask!!!!
-%wct(:,1)=[];wct(:,end)=[];
-%wct(1,:)=[];wct(end,:)=[];
-
-dt = dx./ sqrt(grav*wct);
-if plots
-figure('renderer','zbuffer'),flat_pcolor(dt.*~mask)
-min_dt = min(dt(:));
-[min_dt_j,min_dt_i] = find(dt==min_dt);
-hold on, plot(min_dt_i,min_dt_j,'ks')
-str1 = num2str(min_dt);
-str=(['Minimum dt =',str1]);
-hold on, text(min_dt_i+5,min_dt_j,str)
-end
-
-%
-
-
 netcdf.putVar(id, pm_id, pm');
 netcdf.putVar(id, pn_id, pn');
-%nc{'pm'}(1:MP,1:LP) = pm;
-%nc{'pn'}(1:MP,1:LP) = pn;
+
 
 dmde = zeros(size(pm));
 dndx = zeros(size(pn));
@@ -987,3 +892,29 @@ netcdf.close(id);
 disp('Done.')
 %endef(nc)
 %close(nc)
+
+
+% Look for CFL violations
+
+dx =  min(gx,gy);
+grav = 9.81;
+dt = dx./ sqrt(grav*wct);
+
+figure,flat_pcolor(dt.*~mask)
+min_dt = min(dt(:));
+[min_dt_j,min_dt_i] = find(dt==min_dt);
+str1 = num2str(min_dt);
+str=(['Minimum DT =',str1,' at ',num2str(min_dt_i),',',num2str(min_dt_j)]);
+title(str)
+hold on, plot(min_dt_i,min_dt_j,'kx')
+h_cb=colorbar;
+title(h_cb,'min DT (s)')
+
+% plot rx values
+%[~,~,Cs_w]=scoord(bathymetry,grid_x(j_rho, i_rho),grid_y(j_rho, i_rho),2,4,.9,.4,50,31,1
+%[rx0,rx1]=calc_rx(roms_grid,Cs_w,N)
+%figure,flat_pcolor(rx1),colorbar
+%title(['rx1 (max rx1=',num2str(max(rx1(:))),')'])
+%figure,flat_pcolor(rx0),colorbar
+%title(['rx0 (max rx0=',num2str(max(rx0(:))),')'])
+%
