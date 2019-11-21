@@ -36,8 +36,8 @@ xmax=2467;
 ymin=398;
 ymax=603;
 [x,y] = ndgrid(xmin:res/2:xmax+res/2),ymin:res/2:ymax+res/2);
-x_rho = nan(size(x_rho,1)+2,size(x_rho,2)+2); x_rho(2:end-1,2:end-1)=x; BREAK HERE
-y_rho = y[1::2,1::2]
+x_rho = x(2:2:end,2:2:end);
+y_rho = y(2:2:end,2:2:end);
 
 %calculate lat,lon points
 lat,lon = inverse_polar_stereo(x,y,0,0,-71.0)
