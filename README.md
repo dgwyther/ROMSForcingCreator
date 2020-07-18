@@ -8,7 +8,11 @@ Scripts for making ROMS forcing files in Matlab. The repository is split into se
 
 More thorough details are provided below:
 ### Lateral boundary conditions
+Edit the file `make_lbc.m`. First set the gridname with `grdname`; the output filename with `bryname`; the timings of the forcing product (e.g. `MinYear=1992; MaxYear=2015;` for interannual forcing; `MinYear=2006; MaxYear=2006;` for climatology forcing); the boundaries of the box to extract data from ECCO2 (e.g. `ECCObounds = [410 525 80 125]`); and the `RunName` (for metadata).
 
+You will also need to match the vertical stretching settings which you chose in the `*.in` file.
+
+The `DataProduct` selects the source data for making the boundary conditions; match the example strings shown in `make_lbc.m`. The `ForcingType` chooses the type of forcing, e.g. climatology, interannual forcing, single year, and is chosen with a number matching the examples in `make_lbc.m`.
 ### Surface boundary conditions
 
 ### Grid
