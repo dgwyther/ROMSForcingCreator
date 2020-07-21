@@ -1,16 +1,23 @@
-%channel_or_sheet = 'sheet'
-%channel_or_sheet = 'channel'
+function  do_load_CD_sgfw_v2(grdName,inputData,outData)
+
 %load ROMS data
-h=ncread('/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc','h');
-lon_rho=ncread('/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc','lon_rho');
-lat_rho=ncread('/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc','lat_rho');
-lon_u=ncread('/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc','lon_u');
-lat_u=ncread('/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc','lat_u');
-lon_v=ncread('/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc','lon_v');
-lat_v=ncread('/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc','lat_v');
-mask_rho=ncread('/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc','mask_rho');
-mask_u=ncread('/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc','mask_u');
-mask_v=ncread('/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc','mask_v');
+h=ncread(grdname,'h');
+lon_rho=ncread(grdName,'lon_rho');
+lat_rho=ncread(grdName,'lat_rho');
+lon_u=ncread(grdName,'lon_u');
+lat_u=ncread(grdName,'lat_u');
+lon_v=ncread(grdName,'lon_v');
+lat_v=ncread(grdName,'lat_v');
+mask_rho=ncread(grdName,'mask_rho');
+mask_u=ncread(grdName,'mask_u');
+mask_v=ncread(grdName,'mask_v');
+
+% load inputData
+disp('loading SGFW data. Expecting CSV with X (first col), Y (2nd col) and flow (3rd col)')
+inputData = csvread(inputName);
+river_X=inputData(:,1)'; %x loc
+river_Y=inputData(:,2)'; %y loc
+river_flux = inputData(:,3)'; disp('hydro data loaded')
 
 %make mask which is shifted E/W (u) and N/S (v)
 mask_u1 = (mask_rho(1:end-1,:)+mask_rho(2:end,:))/2;
@@ -136,47 +143,6 @@ bnd_coords_final(:,1)=bnd_coords(bnd_coords_sort,1);
 bnd_coords_final(:,2)=bnd_coords(bnd_coords_sort,2);
 uORv_sorted= bnd_coords_uORvindex(bnd_coords_sort); %1 for u and -1 for v
 end
-
-% load river data
-%FlowType = 'T8e-5';
-%%
-Input_data=csvread('Totten_Oct17_outputs.csv');
-
-
-if strcmp(channel_or_sheet,'channel')
-river_X=Input_data(:,3)'; %x loc
-river_Y=Input_data(:,4)'; %y loc
-river_flux = Input_data(:,6)'; disp('channel data loaded')
-elseif strcmp(channel_or_sheet,'sheet')
-river_X=Input_data(:,1)'; %x loc
-river_Y=Input_data(:,2)'; %y loc
-river_flux = Input_data(:,5)'; disp('sheet data loaded')
-else 
-disp('choose either channel or sheet')
-end
-
-% choose type:
-%T1. Tel 1e-4
-%T5. Tel 5e-4 
-%T8. Tel 8e-5
-%B1. Bed 1e-4
-%B5. Bed 5e-4
-%B8. Bed 8e-5
-%if strcmp(FlowType,'T1e-4')
-%river_flux = Input_data(3,:); disp('flow type chosen is Tel 1e-4')
-%elseif strcmp(FlowType,'T5e-4')
-%river_flux = Input_data(4,:); disp('flow type chosen is Tel 5e-4')
-%elseif strcmp(FlowType,'T8e-5')
-%river_flux = Input_data(5,:); disp('flow type chosen is Tel 8e-5')
-%elseif strcmp(FlowType,'B1e-4')
-%river_flux = Input_data(6,:); disp('flow type chosen is Bed 1e-4')
-%elseif strcmp(FlowType,'B5e-4')
-%river_flux = Input_data(7,:); disp('flow type chosen is Bed 5e-4')
-%elseif strcmp(FlowType,'B8e-5')
-%river_flux = Input_data(8,:); disp('flow type chosen is Bed 8e-5')
-%else
-%disp('choose correct flow type')
-%end
 
 [river_lat,river_lon] = ps2ll(river_X,river_Y);
 
@@ -438,7 +404,7 @@ Data_mat_filtered(zero_indices,:)=[];
 %Data_mat_filtered = Data_mat_filtered(logical(Data_mat_filtered(:,5)),:);
 %Data_mat_filtered
 
-save(['Totten_river_sources_forplotting_',channel_or_sheet,'.mat'],'channel_or_sheet','notzero_indices','ROMS_river_lonlat_filtered','Data_mat_filtered');
+save(['tmp.',river_sources_forplotting.mat'],'channel_or_sheet','notzero_indices','ROMS_river_lonlat_filtered','Data_mat_filtered');
 
 figure('position',[250 750 2400 1200])
 flat_pcolor(lon_rho,lat_rho,h),
@@ -464,5 +430,5 @@ ROMS_river_fluxes_old = ROMS_river_fluxes; ROMS_river_fluxes = Data_mat_filtered
 ROMS_river_lonlat_filtered=ROMS_river_lonlat_filtered(notzero_indices,:);
 
 
-save(['Totten_river_sources_',channel_or_sheet,'.mat'],'ROMS_X_pos','ROMS_E_pos','ROMS_direction','ROMS_flux_multiplier','ROMS_river_fluxes','ROMS_river_lonlat_filtered');
+save(outName,'ROMS_X_pos','ROMS_E_pos','ROMS_direction','ROMS_flux_multiplier','ROMS_river_fluxes','ROMS_river_lonlat_filtered');
 

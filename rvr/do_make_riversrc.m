@@ -1,30 +1,42 @@
-grdname='/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc'
-RunName='tisom015_sgfw'
-frcname='tisom015_river_src_CombinedShtChn.nc';
-channel_or_sheet=''
+% filenames
+grdName='/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc'
+runName='tisom015_sgfw'
+frcName='tisom015_river_src_CombinedShtChn.nc';
+inputName1='Totten_Jan20_channels_normalcond.csv';
+% if including a second flow type (e.g. sheet and channel)
+COMBINE_FLOW = 1
+inputName2='Totten_Jan20_sheet_normalcond.csv'
+fileOne = 'tmp.tisom017_sgfw_Chn.mat' % names of intermediate files
+fileTwo = 'tmp.tisom017_sgfw_Sht.mat' % names of intermediate files
+% grid settings
+N = 31
+% settings
 InertTracers = [1]; % vector of 1's equal to number of tracers <---- this defines the number of tracers you want.
 ZERO_TRANSPORT=0  %if you want to run with tracers and turn on river sources after a restart. This adds rivers and dye with 0 influence, but fills the netcdf with placeholders.
 NO_NEGATIVE_TRANSPORT=0
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-title =([RunName,' river source file']); % Make title from model name variable
+USE_DEBUG=0
 
-N = 31; %number of s-levels
-Lpinfo=ncinfo(grdname,'lon_rho'); Lp = Lpinfo.Size(1);
-Mpinfo=ncinfo(grdname,'lat_rho'); Mp = Mpinfo.Size(2);
+%---- Begin code: ----%
+% add functions directory:
+addpath('functions/')
+
+do_load_CD_sgfw_v2(grdName,inputName1,[runName,'_river_sources.mat']) % first load the CSV and format into appropriate mat file
+
+if COMBINE_FLOW; 
+    do_load_CD_sgfw_v2(grdName,inputName2,'tmp.tisom017_sgfw_Sht.mat');
+    do_combine_rvrsources([runName,'_river_sources.mat'],fileOne,fileTwo); 
+end
+
+% set title and size of grid:
+title =([runName,' river source file']); % Make title from model name variable
+Lpinfo=ncinfo(grdName,'lon_rho'); Lp = Lpinfo.Size(1);
+Mpinfo=ncinfo(grdName,'lat_rho'); Mp = Mpinfo.Size(2);
 L=Lp-1;
 M=Mp-1;
 
-
 disp('load input file')
-if strcmp(channel_or_sheet,'channel') | strcmp(channel_or_sheet,'sheet')
-disp(['using ',['/mnt/IceOceanVolume/tisom015_sgfw/rvr/Totten_river_sources_',channel_or_sheet,'_.mat']'])
-load('/mnt/IceOceanVolume/tisom015_sgfw/rvr/Totten_river_sources_',channel_or_sheet,'_.mat')
-else
-disp(['using ','/mnt/IceOceanVolume/tisom015_sgfw/rvr/Totten_river_sources.mat'])
-load('/mnt/IceOceanVolume/tisom015_sgfw/rvr/Totten_river_sources.mat')
-end
+load([runName,'_river_sources.mat'])
 
-USE_DEBUG=0
 if USE_DEBUG
 disp('in debug mode')
 ROMS_X_pos(11:end)=[];
@@ -57,7 +69,7 @@ river_no = length(river_index);
 disp('define tracer properties')
 % set river tracer props
 Salinity = 0;
-zice = ncread(grdname,'zice'); lat_rho=ncread(grdname,'lat_rho');
+zice = ncread(grdName,'zice'); lat_rho=ncread(grdName,'lat_rho');
 for ss=1:length(river_Xposition)
 %if river_direction(ss) == 0 %u-face
 location_i = river_Xposition(ss)+1; %applies similarly for either u or v-face
@@ -93,11 +105,11 @@ time_perpetual=1; %just use a 'none' calendar.
 
 
 disp(' ')
-disp([' Creating the file : ',frcname])
+disp([' Creating the file : ',frcName])
 disp(' ')
 
 
-id = netcdf.create(frcname, 'clobber');
+id = netcdf.create(frcName, 'clobber');
 %
 %  Create dimensions
 %
@@ -172,7 +184,7 @@ end
     disp('Create global attribute')
 netcdf.putAtt(id, netcdf.getConstant('NC_GLOBAL'), 'title', title);
 netcdf.putAtt(id, netcdf.getConstant('NC_GLOBAL'), 'date', date);
-netcdf.putAtt(id, netcdf.getConstant('NC_GLOBAL'), 'grd_file', grdname);
+netcdf.putAtt(id, netcdf.getConstant('NC_GLOBAL'), 'grd_file', grdName);
 netcdf.putAtt(id, netcdf.getConstant('NC_GLOBAL'), 'type', 'ROMS forcing file');
 netcdf.endDef(id);
 
@@ -209,6 +221,6 @@ netcdf.close(id);
 
 
 figure('position',[600 600   1000        1000])
-map_rivers(grdname,frcname)
+map_rivers(grdName,frcName)
 axis square,axis([113.5 120 -67.5 -66.6])
 %axis([117 118 -67.2 -66.9])

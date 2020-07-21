@@ -1,8 +1,9 @@
+function do_combine_rvrsources(outName,fileOne,fileTwo)
 %% load rvr sources and locs for FILE 1
-load('Totten_river_sources_sheet.mat','ROMS_X_pos','ROMS_E_pos','ROMS_direction','ROMS_flux_multiplier','ROMS_river_fluxes','ROMS_river_lonlat_filtered')
+load(fileOne,'ROMS_X_pos','ROMS_E_pos','ROMS_direction','ROMS_flux_multiplier','ROMS_river_fluxes','ROMS_river_lonlat_filtered')
 ROMS_X_pos_s = ROMS_X_pos; ROMS_E_pos_s = ROMS_E_pos; ROMS_direction_s = ROMS_direction; ROMS_flux_multiplier_s = ROMS_flux_multiplier; ROMS_river_fluxes_s = ROMS_river_fluxes; ROMS_river_lonlat_filtered_s=ROMS_river_lonlat_filtered;
 %% load rvr sources and locs for FILE 2
-load('Totten_river_sources_channel.mat','ROMS_X_pos','ROMS_E_pos','ROMS_direction','ROMS_flux_multiplier','ROMS_river_fluxes','ROMS_river_lonlat_filtered')
+load(fileTwo,'ROMS_X_pos','ROMS_E_pos','ROMS_direction','ROMS_flux_multiplier','ROMS_river_fluxes','ROMS_river_lonlat_filtered')
 ROMS_X_pos_c = ROMS_X_pos; ROMS_E_pos_c = ROMS_E_pos; ROMS_direction_c = ROMS_direction; ROMS_flux_multiplier_c = ROMS_flux_multiplier; ROMS_river_fluxes_c = ROMS_river_fluxes; ROMS_river_lonlat_filtered_c=ROMS_river_lonlat_filtered;
 %% combine sources and locs
 ROMS_X_pos = [ROMS_X_pos_s,ROMS_X_pos];
@@ -31,7 +32,7 @@ ROMS_E_pos = Data_mat_filtered(:,2)';
 ROMS_direction = Data_mat_filtered(:,3)';
 ROMS_flux_multiplier = Data_mat_filtered(:,4)';
 ROMS_river_fluxes = Data_mat_filtered(:,5)';
-save('Totten_river_sources.mat','ROMS_X_pos','ROMS_E_pos','ROMS_direction','ROMS_flux_multiplier','ROMS_river_fluxes','ROMS_river_lonlat_filtered');
+save(outName,'ROMS_X_pos','ROMS_E_pos','ROMS_direction','ROMS_flux_multiplier','ROMS_river_fluxes','ROMS_river_lonlat_filtered');
 
 figure('position',[250 750 2400 1200])
 flat_pcolor(lon_rho,lat_rho,h),
