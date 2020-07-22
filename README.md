@@ -17,7 +17,8 @@ The `DataProduct` selects the source data for making the boundary conditions; ma
 
 ### Grid
 
-
+### River sources
+Requirements: Antarctic Mapping Tools, available at [Matlab File Exchange](https://au.mathworks.com/matlabcentral/fileexchange/47638-antarctic-mapping-tools)
 
 # Authors:
 David E. Gwyther
