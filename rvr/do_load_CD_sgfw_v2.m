@@ -1,7 +1,7 @@
-function  do_load_CD_sgfw_v2(grdName,inputData,outData)
+function  do_load_CD_sgfw_v2(grdName,inputName,outName,figure_pos_lims,figure_ax_lims)
 
 %load ROMS data
-h=ncread(grdname,'h');
+h=ncread(grdName,'h');
 lon_rho=ncread(grdName,'lon_rho');
 lat_rho=ncread(grdName,'lat_rho');
 lon_u=ncread(grdName,'lon_u');
@@ -13,7 +13,8 @@ mask_u=ncread(grdName,'mask_u');
 mask_v=ncread(grdName,'mask_v');
 
 % load inputData
-disp('loading SGFW data. Expecting CSV with X (first col), Y (2nd col) and flow (3rd col)')
+disp('loading SGFW data. Expecting CSV with X (first col), Y (2nd col) and flow (3rd col)...')
+disp(['... loading data from ',inputName])
 inputData = csvread(inputName);
 river_X=inputData(:,1)'; %x loc
 river_Y=inputData(:,2)'; %y loc
@@ -165,7 +166,7 @@ end
 if 0 %old fig
 figure('position',[250 750 1000 1000])
 flat_pcolor(lon_rho,lat_rho,h);
-axis([113 119 -67.5 -67])
+axis equal,axis(figure_ax_lims)
 hold on,plot(river_lon,river_lat,'x','markersize',3);
 
 %plot lines between original location and new location
@@ -207,11 +208,11 @@ ROMS_river_dir=dir_ROMS_lonlat;
 end
 
 
-figure('position',[250 750 1000 1000])
+figure('position',figure_pos_lims);
+subaxis(4,1,1)
 flat_pcolor(lon_rho,lat_rho,h);
-axis([113 119 -67.5 -67])
+axis equal,axis(figure_ax_lims)
 hold on,plot(river_lon,river_lat,'x','markersize',3);
-
 for ii=1:size(closest_ROMS_lonlat,1)
 if ROMS_river_dir(ii)==1
 plot(ROMS_river_lonlat(ii,1),ROMS_river_lonlat(ii,2),'r>')
@@ -223,7 +224,7 @@ elseif ROMS_river_dir(ii)==4
 plot(ROMS_river_lonlat(ii,1),ROMS_river_lonlat(ii,2),'rv')
 end
 end
-
+ntitle('river locations, (x) raw SFGW data, (arrows) ROMS locations')
 
 
 %% outputting
@@ -250,40 +251,12 @@ ROMS_direction=ROMS_river_uORv; ROMS_direction(ROMS_direction==-1)=0; ROMS_direc
 
 ROMS_flux_multiplier = ROMS_river_dir; ROMS_flux_multiplier(ROMS_flux_multiplier==3 | ROMS_flux_multiplier==4)=-1; ROMS_flux_multiplier(ROMS_flux_multiplier==2)=1;%1 for north/east, -1 for west/south
 
-%only plot u's
-
-figure('position',[250 750 1000 1000])
-flat_pcolor(lon_rho,lat_rho,h);
-axis([113 119 -67.5 -67])
-hold on,plot(river_lon,river_lat,'x','markersize',3);
-for ii=1:length(uORv_ROMS_lonlat)
-if uORv_ROMS_lonlat(ii)==1
-
-%plot lines between original location and new location
-plot(closest_ROMS_lonlat(ii,1),closest_ROMS_lonlat(ii,2),'ro','markersize',5);
-hold on
-plot([GlaDS_lonlat(ii,1),closest_ROMS_lonlat(ii,1)],[GlaDS_lonlat(ii,2),closest_ROMS_lonlat(ii,2)],'k-');
-end
-end
-
-for ii=1:length(uORv_ROMS_lonlat)
-if uORv_ROMS_lonlat(ii)==-1
-
-%plot lines between original location and new location
-plot(closest_ROMS_lonlat(ii,1),closest_ROMS_lonlat(ii,2),'ro','markersize',5);
-hold on
-plot([GlaDS_lonlat(ii,1),closest_ROMS_lonlat(ii,1)],[GlaDS_lonlat(ii,2),closest_ROMS_lonlat(ii,2)],'k-');
-end
-end
-
-
-figure('position',[250 750 1000 1000])
+subaxis(4,1,2)
 flat_pcolor(lon_rho,lat_rho,h),
-axis([113 119 -67.5 -67])
+axis equal,axis(figure_ax_lims)
 hold on,plot(river_lon,river_lat,'x','markersize',3)
 for ii=1:length(uORv_ROMS_lonlat)
 if uORv_ROMS_lonlat(ii)==1
-
 %plot lines between original location and new location
 %plot(lon_u(ROMS_X_pos(ii),ROMS_E_pos(ii)),lat_u(ROMS_X_pos(ii),ROMS_E_pos(ii)),'ro','markersize',5);
 hold on
@@ -292,7 +265,6 @@ end
 end
 for ii=1:length(uORv_ROMS_lonlat)
 if uORv_ROMS_lonlat(ii)==-1
-
 %plot lines between original location and new location
 %plot(lon_v(ROMS_X_pos(ii),ROMS_E_pos(ii)),lat_v(ROMS_X_pos(ii),ROMS_E_pos(ii)),'ro','markersize',5);
 hold on
@@ -310,11 +282,11 @@ elseif ROMS_river_dir(ii)==4
 plot(ROMS_river_lonlat(ii,1),ROMS_river_lonlat(ii,2),'rv')
 end
 end
+ntitle('ROMS river locations (arrows showing flux dir) with lines to raw locations (x)')
 
-figure('position',[250 750 1000 1000])
+subaxis(4,1,3)
 flat_pcolor(lon_rho,lat_rho,h),
-ntitle('CD sgfw flow locations and volume fluxes')
-axis([113 119 -67.5 -67])
+axis equal,axis(figure_ax_lims)
 hold on,hhh3=bubbleplot(river_lon,river_lat,[],river_flux);
 set(hhh3,'MarkerEdgeColor',[0 0 0],...
               'MarkerFaceColor',[1 .7 0],...
@@ -324,17 +296,7 @@ set(hhh4,'MarkerEdgeColor',[0 0 0],...
               'MarkerFaceColor',[1 .7 0],...
               'LineWidth',1.5)
 text([118 118 118 118]+.1,[-67.35,-67.375,-67.4 -67.425],{num2str(max(river_flux)) '1e-1' '1e-2' '1e-3'})
-
-%figure('position',[250 750 1000 1000])
-%flat_pcolor(lon_rho,lat_rho,h),
-%axis([113 119 -67.5 -67])
-%hold on, scatter(river_lon,river_lat,abs(river_flux)/max(river_flux).*300,'MarkerEdgeColor',[0 0 0],...
-%              'MarkerFaceColor',[1 .7 0],...
-%              'LineWidth',1.5)
-%scatter([118 118 118 118],[-67.35,-67.375,-67.4 -67.425],abs([.5 1e-1 1e-2 1e-3])/max(river_flux).*300,'MarkerEdgeColor',[0 0 0],...
-%              'MarkerFaceColor',[1 .7 0],...
-%              'LineWidth',1.5)
-%text([118 118 118 118]+.1,[-67.35,-67.375,-67.4 -67.425],{'5e-1' '1e-1' '1e-2' '1e-3'})
+ntitle('Raw SGFW discharge locations')
 
 %convert between MATLAB and ROMS numbering
 % see:
@@ -404,12 +366,11 @@ Data_mat_filtered(zero_indices,:)=[];
 %Data_mat_filtered = Data_mat_filtered(logical(Data_mat_filtered(:,5)),:);
 %Data_mat_filtered
 
-save(['tmp.',river_sources_forplotting.mat'],'channel_or_sheet','notzero_indices','ROMS_river_lonlat_filtered','Data_mat_filtered');
+save(['tmp.river_sources_forplotting.mat'],'zero_indices','notzero_indices','ROMS_river_lonlat_filtered','Data_mat_filtered');
 
-figure('position',[250 750 2400 1200])
+subaxis(4,1,4)
 flat_pcolor(lon_rho,lat_rho,h),
-ntitle(['Volume fluxes (m3/s) on ROMS grid for ',channel_or_sheet,' flow'])
-axis([112.9 121 -67.6 -66])
+axis equal,axis(figure_ax_lims)
 hold on,hhh3=bubbleplot(ROMS_river_lonlat_filtered(notzero_indices,1),ROMS_river_lonlat_filtered(notzero_indices,2),[],Data_mat_filtered(:,5));
 set(hhh3,'MarkerEdgeColor',[0 0 0],...
               'MarkerFaceColor',[1 .7 0],...
@@ -419,7 +380,7 @@ set(hhh4,'MarkerEdgeColor',[0 0 0],...
               'MarkerFaceColor',[1 .7 0],...
               'LineWidth',1.5)
 text([118 118 118 118]+.1,[-67.35,-67.375,-67.4 -67.425],{num2str(max(Data_mat_filtered(:,5))) '1e-1' '1e-2' '1e-3'},'color',[.8 .8 .8])
-
+ntitle('volume fluxes (m3/s) on ROMS grid')
 
 
 ROMS_X_pos_old = ROMS_X_pos; ROMS_X_pos = Data_mat_filtered(:,1)';

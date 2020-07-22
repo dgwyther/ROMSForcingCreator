@@ -1,30 +1,35 @@
 % filenames
-grdName='/mnt/IceOceanVolume/tisom015/grid/tisom008_canal_grd.nc'
-runName='tisom015_sgfw'
-frcName='tisom015_river_src_CombinedShtChn.nc';
-inputName1='Totten_Jan20_channels_normalcond.csv';
+grdName='/mnt/IceOceanVolume/tisom017_sgfw/tisom008_canal_grd.nc';
+runName='tisom017_sgfw';
+frcName='tisom017_river_src_Combined_normalFlow.nc';
+inputName1='/home/ubuntu/IceOceanVolume/tisom017_sgfw/Totten_Jan20_channels_normalcond.csv';
+addpath(genpath('/mnt/IceOceanVolume/MATLAB')) %add path to AMT
 % if including a second flow type (e.g. sheet and channel)
-COMBINE_FLOW = 1
-inputName2='Totten_Jan20_sheet_normalcond.csv'
-fileOne = 'tmp.tisom017_sgfw_Chn.mat' % names of intermediate files
-fileTwo = 'tmp.tisom017_sgfw_Sht.mat' % names of intermediate files
+COMBINE_FLOW = 0;
+inputName2='/home/ubuntu/IceOceanVolume/tisom017_sgfw/Totten_Jan20_sheet_normalcond.csv';
+fileOne = [runName,'_river_sources.mat']; % names of intermediate files
+fileTwo = 'tmp.tisom017_sgfw_Sht.mat'; % names of intermediate files
+% plot settings
+PLOTTING=1;
+figure_pos_lims=[250 750 1700 1500];
+figure_ax_lims=[113.5 117 -67.5 -67];
 % grid settings
-N = 31
+N = 31;
 % settings
 InertTracers = [1]; % vector of 1's equal to number of tracers <---- this defines the number of tracers you want.
-ZERO_TRANSPORT=0  %if you want to run with tracers and turn on river sources after a restart. This adds rivers and dye with 0 influence, but fills the netcdf with placeholders.
-NO_NEGATIVE_TRANSPORT=0
-USE_DEBUG=0
+ZERO_TRANSPORT=0;  %if you want to run with tracers and turn on river sources after a restart. This adds rivers and dye with 0 influence, but fills the netcdf with placeholders.
+NO_NEGATIVE_TRANSPORT=0;
+USE_DEBUG=0;
 
 %---- Begin code: ----%
 % add functions directory:
 addpath('functions/')
 
-do_load_CD_sgfw_v2(grdName,inputName1,[runName,'_river_sources.mat']) % first load the CSV and format into appropriate mat file
+do_load_CD_sgfw_v2(grdName,inputName1,fileOne,figure_pos_lims,figure_ax_lims) % first load the CSV and format into appropriate mat file
 
 if COMBINE_FLOW; 
-    do_load_CD_sgfw_v2(grdName,inputName2,'tmp.tisom017_sgfw_Sht.mat');
-    do_combine_rvrsources([runName,'_river_sources.mat'],fileOne,fileTwo); 
+    do_load_CD_sgfw_v2(grdName,inputName2,fileTwo,figure_pos_lims,figure_ax_lims);
+    do_combine_rvrsources(fileOne,fileTwo,[runName,'_river_sources.mat']); 
 end
 
 % set title and size of grid:
@@ -219,8 +224,7 @@ netcdf.close(id);
 
     disp('DONE')
 
-
-figure('position',[600 600   1000        1000])
+figure('position',[figure_pos_lims(1) figure_pos_lims(2) figure_pos_lims(3) figure_pos_lims(4)/4])
 map_rivers(grdName,frcName)
-axis square,axis([113.5 120 -67.5 -66.6])
+axis equal,axis(figure_ax_lims)
 %axis([117 118 -67.2 -66.9])

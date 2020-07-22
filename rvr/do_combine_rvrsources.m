@@ -1,4 +1,4 @@
-function do_combine_rvrsources(outName,fileOne,fileTwo)
+function do_combine_rvrsources(fileOne,fileTwo,outName)
 %% load rvr sources and locs for FILE 1
 load(fileOne,'ROMS_X_pos','ROMS_E_pos','ROMS_direction','ROMS_flux_multiplier','ROMS_river_fluxes','ROMS_river_lonlat_filtered')
 ROMS_X_pos_s = ROMS_X_pos; ROMS_E_pos_s = ROMS_E_pos; ROMS_direction_s = ROMS_direction; ROMS_flux_multiplier_s = ROMS_flux_multiplier; ROMS_river_fluxes_s = ROMS_river_fluxes; ROMS_river_lonlat_filtered_s=ROMS_river_lonlat_filtered;
