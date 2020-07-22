@@ -5,7 +5,7 @@ frcName='tisom017_river_src_Combined_normalFlow.nc';
 inputName1='/home/ubuntu/IceOceanVolume/tisom017_sgfw/Totten_Jan20_channels_normalcond.csv';
 addpath(genpath('/mnt/IceOceanVolume/MATLAB')) %add path to AMT
 % if including a second flow type (e.g. sheet and channel)
-COMBINE_FLOW = 0;
+COMBINE_FLOW = 1;
 inputName2='/home/ubuntu/IceOceanVolume/tisom017_sgfw/Totten_Jan20_sheet_normalcond.csv';
 fileOne = [runName,'_river_sources.mat']; % names of intermediate files
 fileTwo = 'tmp.tisom017_sgfw_Sht.mat'; % names of intermediate files
@@ -29,7 +29,7 @@ do_load_CD_sgfw_v2(grdName,inputName1,fileOne,figure_pos_lims,figure_ax_lims) % 
 
 if COMBINE_FLOW; 
     do_load_CD_sgfw_v2(grdName,inputName2,fileTwo,figure_pos_lims,figure_ax_lims);
-    do_combine_rvrsources(fileOne,fileTwo,[runName,'_river_sources.mat']); 
+    do_combine_rvrsources(grdName,fileOne,fileTwo,[runName,'_river_sources.mat']); 
 end
 
 % set title and size of grid:
